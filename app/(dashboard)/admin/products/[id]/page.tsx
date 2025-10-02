@@ -266,17 +266,20 @@ const DashboardProductDetails = ({
         {/* Main image file upload div - start */}
         <div>
           <input
-            type="file"
-            className="file-input file-input-bordered file-input-lg w-full max-w-sm"
-            onChange={(e) => {
-              const selectedFile = e.target.files[0];
+  type="file"
+  className="file-input file-input-bordered file-input-lg w-full max-w-sm"
+  onChange={(e) => {
+    const file = e.target.files?.[0]; // ✅ Optional Chaining: يتحقق من null تلقائيًا
+    if (file) {
+      uploadFile(file);
+      // ❌ لا تستخدم file.name هنا! لأن الاسم الحقيقي سيأتي من السيرفر
+      // setProduct({ ...product!, mainImage: file.name }); ← احذف هذا السطر
+    }
+  }}
+/>
 
-              if (selectedFile) {
-                uploadFile(selectedFile);
-                setProduct({ ...product!, mainImage: selectedFile.name });
-              }
-            }}
-          />
+
+
           {product?.mainImage && (
             <Image
               // src={`/` + product?.mainImage}
