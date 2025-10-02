@@ -3,17 +3,18 @@ import apiClient from "@/lib/api";
 import React from "react";
 import { sanitize } from "@/lib/sanitize";
 
+// ✅ النوع الصحيح لـ searchParams في Next.js App Router
 interface Props {
-  searchParams: { search: string };
+  searchParams: Promise<{ search?: string }>;
 }
 
-// sending api request for search results for a given search text
+// ✅ الصفحة كـ Server Component (async)
 const SearchPage = async ({ searchParams }: Props) => {
+  // ✅ احصل على القيمة الفعلية من الـ Promise
   const sp = await searchParams;
-  const data = await apiClient.get(
-    `/api/search?query=${sp?.search || ""}`
-  );
 
+  // جلب النتائج من الـ API
+  const data = await apiClient.get(`/api/search?query=${sp?.search || ""}`);
   const products = await data.json();
 
   return (
@@ -42,7 +43,3 @@ const SearchPage = async ({ searchParams }: Props) => {
 };
 
 export default SearchPage;
-
-/*
-
-*/
