@@ -1,7 +1,6 @@
 // lib/auth-options.ts
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import prisma from "@/utils/db";
 import type { JWT } from "next-auth/jwt";
 import type { Session, User } from "next-auth";
 
@@ -16,6 +15,9 @@ export const authOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Import prisma only when needed (at runtime, not build time)
+        const prisma = (await import("@/utils/db")).default;
+        
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });

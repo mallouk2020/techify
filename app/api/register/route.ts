@@ -6,6 +6,10 @@ import { registrationSchema } from "@/utils/schema";
 import { sanitizeInput, commonValidations } from "@/utils/validation";
 import { handleApiError, AppError } from "@/utils/errorHandler";
 
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export const POST = async (request: Request) => {
   try {
     // Get client IP for rate limiting
