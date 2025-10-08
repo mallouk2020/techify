@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 
 export async function requireAdmin() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as any);
   
   if (!session) {
     redirect("/login");
@@ -18,7 +18,7 @@ export async function requireAdmin() {
 }
 
 export async function isAdmin(): Promise<boolean> {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as any);
   return (session as any)?.user?.role === "admin";
 }
 
