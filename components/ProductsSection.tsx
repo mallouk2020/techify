@@ -14,21 +14,51 @@ import Heading from "./Heading";
 import apiClient from "@/lib/api";
 
 const ProductsSection = async () => {
-  // sending API request for getting all products
-  const data = await apiClient.get("/api/products");
-  const products = await data.json();
-  return (
-    <div className="bg-blue-500 border-t-4 border-white">
-      <div className="max-w-screen-2xl mx-auto pt-20">
-        <Heading title="FEATURED PRODUCTS" />
-        <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
-          {products.map((product: Product) => (
-            <ProductItem key={product.id} product={product} color="white" />
-          ))}
+  try {
+    // sending API request for getting all products
+    const data = await apiClient.get("/api/products");
+    
+    if (!data.ok) {
+      console.error("Failed to fetch products:", data.status);
+      return (
+        <div className="bg-blue-500 border-t-4 border-white">
+          <div className="max-w-screen-2xl mx-auto pt-20 pb-20">
+            <Heading title="FEATURED PRODUCTS" />
+            <div className="text-center text-white py-10">
+              <p>Products will be available soon. Please check back later.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    const products = await data.json();
+    
+    return (
+      <div className="bg-blue-500 border-t-4 border-white">
+        <div className="max-w-screen-2xl mx-auto pt-20">
+          <Heading title="FEATURED PRODUCTS" />
+          <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+            {products.map((product: Product) => (
+              <ProductItem key={product.id} product={product} color="white" />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return (
+      <div className="bg-blue-500 border-t-4 border-white">
+        <div className="max-w-screen-2xl mx-auto pt-20 pb-20">
+          <Heading title="FEATURED PRODUCTS" />
+          <div className="text-center text-white py-10">
+            <p>Products will be available soon. Please check back later.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default ProductsSection;
