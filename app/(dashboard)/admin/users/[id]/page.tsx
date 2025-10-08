@@ -13,9 +13,8 @@ interface DashboardUserDetailsProps {
 const DashboardSingleUserPage = ({
   params,
 }: DashboardUserDetailsProps) => {
-  const resolvedParams = use(params);
-  const id = resolvedParams.id;
-  
+  const { id } = use(params);
+
   const [userInput, setUserInput] = useState<{
     email: string;
     newPassword: string;
@@ -28,21 +27,18 @@ const DashboardSingleUserPage = ({
   const router = useRouter();
 
   const deleteUser = async () => {
-    const requestOptions = {
-      method: "DELETE",
-    };
-    apiClient.delete(`/api/users/${id}`, requestOptions)
-      .then((response) => {
-        if (response.status === 204) {
-          toast.success("User deleted successfully");
-          router.push("/admin/users");
-        } else {
-          throw Error("There was an error while deleting user");
-        }
-      })
-      .catch((error) => {
-        toast.error("There was an error while deleting user");
-      });
+    try {
+      const response = await apiClient.delete(`/api/users/${id}`);
+      if (response.ok) {
+        toast.success("User deleted successfully");
+        router.push("/admin/users");
+      } else {
+        throw new Error("Error deleting user");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("There was an error while deleting user");
+    }
   };
 
   const updateUser = async () => {
@@ -56,51 +52,50 @@ const DashboardSingleUserPage = ({
         return;
       }
 
-      if (userInput.newPassword.length > 7) {
-        const requestOptions = {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: userInput.email,
-            password: userInput.newPassword,
-            role: userInput.role,
-          }),
-        };
-        apiClient.put(`/api/users/${id}`, requestOptions)
-          .then((response) => {
-            if (response.status === 200) {
-              return response.json();
-            } else {
-              throw Error("Error while updating user");
-            }
-          })
-          .then((data) => toast.success("User successfully updated"))
-          .catch((error) => {
-            toast.error("There was an error while updating user");
-          });
-      } else {
+      if (userInput.newPassword.length <= 7) {
         toast.error("Password must be longer than 7 characters");
         return;
       }
+
+      try {
+        const response = await apiClient.put(`/api/users/${id}`, {
+          email: userInput.email,
+          password: userInput.newPassword,
+          role: userInput.role,
+        });
+
+        if (response.ok) {
+          toast.success("User successfully updated");
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.message || "Error while updating user");
+        }
+      } catch (error) {
+        console.error("Update error:", error);
+        toast.error("There was an error while updating user");
+      }
     } else {
       toast.error("For updating a user you must enter all values");
-      return;
     }
   };
 
   useEffect(() => {
-    // sending API request for a single user
-    apiClient.get(`/api/users/${id}`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
+    const fetchUser = async () => {
+      try {
+        const response = await apiClient.get(`/api/users/${id}`);
+        const data = await response.json();
         setUserInput({
           email: data?.email,
           newPassword: "",
           role: data?.role,
         });
-      });
+      } catch (error) {
+        console.error("Fetch user error:", error);
+        toast.error("Failed to load user data");
+      }
+    };
+
+    fetchUser();
   }, [id]);
 
   return (

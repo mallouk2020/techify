@@ -18,59 +18,43 @@ const DashboardCreateNewUser = () => {
     role: "user",
   });
 
+ 
   const addNewUser = async () => {
-    if (userInput.email === "" || userInput.password === "") {
-      toast.error("You must enter all input values to add a user");
-      return;
-    }
+  if (userInput.email === "" || userInput.password === "") {
+    toast.error("You must enter all input values to add a user");
+    return;
+  }
 
-    // Sanitize form data before sending to API
+  if (!isValidEmailAddressFormat(userInput.email)) {
+    toast.error("You entered invalid email address format");
+    return;
+  }
+
+  if (userInput.password.length <= 7) {
+    toast.error("Password must be longer than 7 characters");
+    return;
+  }
+
+  try {
     const sanitizedUserInput = sanitizeFormData(userInput);
+    const response = await apiClient.post(`/api/users`, sanitizedUserInput);
 
-    if (
-      userInput.email.length > 3 &&
-      userInput.role.length > 0 &&
-      userInput.password.length > 0
-    ) {
-      if (!isValidEmailAddressFormat(userInput.email)) {
-        toast.error("You entered invalid email address format");
-        return;
-      }
-
-      if (userInput.password.length > 7) {
-        const requestOptions: any = {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sanitizedUserInput),
-        };
-        apiClient.post(`/api/users`, requestOptions)
-        
-          .then((response) => {
-            if(response.status === 201){
-              return response.json();
-
-            }else{
-              
-              throw Error("Error while creating user");
-            }
-          })
-          .then((data) => {
-            toast.success("User added successfully");
-            setUserInput({
-              email: "",
-              password: "",
-              role: "user",
-            });
-          }).catch(error => {
-            toast.error("Error while creating user");
-          });
-      } else {
-        toast.error("Password must be longer than 7 characters");
-      }
+    if (response.ok) {
+      toast.success("User added successfully");
+      setUserInput({
+        email: "",
+        password: "",
+        role: "user",
+      });
     } else {
-      toast.error("You must enter all input values to add a user");
+      const errorData = await response.json();
+      toast.error(errorData.message || "Error while creating user");
     }
-  };
+  } catch (error) {
+    console.error("Network error:", error);
+    toast.error("Error while creating user");
+  }
+};
 
   return (
     <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
