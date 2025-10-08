@@ -26,7 +26,7 @@ const BuyNowSingleProductBtn = ({
       id: product?.id.toString(),
       title: product?.title,
       price: product?.price,
-      image: product?.mainImage,
+      mainImage: product?.mainImage || "/placeholder.jpg",
       amount: quantityCount,
     });
     calculateTotals();

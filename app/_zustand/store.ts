@@ -2,11 +2,11 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 export type ProductInCart = {
-  mainImage: any;
+  mainImage: string;
   id: string;
   title: string;
   price: number;
-  image: string;
+  // image: string;
   amount: number;
 };
 

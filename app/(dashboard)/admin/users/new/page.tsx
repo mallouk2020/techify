@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { sanitizeFormData } from "@/lib/form-sanitize";
 import apiClient from "@/lib/api";
 
+
 const DashboardCreateNewUser = () => {
   const [userInput, setUserInput] = useState<{
     email: string;
