@@ -99,7 +99,13 @@ app.use(generalLimiter);
 
 app.use(express.json());
 app.use(cors(corsOptions));
-app.use(fileUpload());
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/',
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  abortOnLimit: true,
+  createParentPath: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Apply specific rate limiters to different route groups
