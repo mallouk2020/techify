@@ -80,7 +80,7 @@ const WishItem = ({
       <th>
         <div className="w-12 h-12 mx-auto" onClick={() => openProduct(slug)}>
           <Image
-            src={`/${image}`}
+            src={image || "/product_placeholder.jpg"}
             width={200}
             height={200}
             className="w-auto h-auto"

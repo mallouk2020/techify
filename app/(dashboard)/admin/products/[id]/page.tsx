@@ -96,6 +96,11 @@ const DashboardProductDetails = ({
 
       if (response.ok) {
         const data = await response.json();
+        // ✅ حفظ رابط Cloudinary في الـ state
+        if (data.filename) {
+          setProduct({ ...product!, mainImage: data.filename });
+          toast.success("Image uploaded successfully");
+        }
       } else {
         toast.error("File upload unsuccessful.");
       }
