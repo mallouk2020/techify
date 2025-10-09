@@ -100,13 +100,7 @@ const AdminSingleOrder = () => {
         return;
       }
 
-      apiClient.put(`/api/orders/${order?.id}`, {
-        method: "PUT", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      })
+      apiClient.put(`/api/orders/${order?.id}`, order)
         .then((response) => {
           if (response.status === 200) {
             toast.success("Order updated successfuly");
@@ -123,17 +117,11 @@ const AdminSingleOrder = () => {
   };
 
   const deleteOrder = async () => {
-    const requestOptions = {
-      method: "DELETE",
-    };
-
     apiClient.delete(
-      `/api/order-product/${order?.id}`,
-      requestOptions
+      `/api/order-product/${order?.id}`
     ).then((response) => {
       apiClient.delete(
-        `/api/orders/${order?.id}`,
-        requestOptions
+        `/api/orders/${order?.id}`
       ).then((response) => {
         toast.success("Order deleted successfully");
         router.push("/admin/orders");

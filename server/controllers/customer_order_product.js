@@ -87,22 +87,16 @@ const deleteProductOrder = asyncHandler(async (request, response) => {
   const { id } = request.params;
 
   if (!id) {
-    throw new AppError("Order product ID is required", 400);
+    throw new AppError("Order ID is required", 400);
   }
 
-  const existingOrder = await prisma.customer_order_product.findUnique({
-    where: { id }
-  });
-
-  if (!existingOrder) {
-    throw new AppError("Order product not found", 404);
-  }
-
+  // Delete all products associated with this order
   await prisma.customer_order_product.deleteMany({
     where: {
       customerOrderId: id
     }
   });
+  
   return response.status(204).send();
 });
 
