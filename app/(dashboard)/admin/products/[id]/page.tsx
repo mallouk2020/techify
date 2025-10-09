@@ -28,10 +28,7 @@ const DashboardProductDetails = ({
 
   // functionality for deleting product
   const deleteProduct = async () => {
-    const requestOptions = {
-      method: "DELETE",
-    };
-    apiClient.delete(`/api/products/${id}`, requestOptions)
+    apiClient.delete(`/api/products/${id}`)
       .then((response) => {
         if (response.status !== 204) {
           if (response.status === 400) {
@@ -64,12 +61,7 @@ const DashboardProductDetails = ({
       return;
     }
 
-    const requestOptions = {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(product),
-    };
-    apiClient.put(`/api/products/${id}`, requestOptions)
+    apiClient.put(`/api/products/${id}`, product)
       .then((response) => {
         if (response.status === 200) {
           return response.json();

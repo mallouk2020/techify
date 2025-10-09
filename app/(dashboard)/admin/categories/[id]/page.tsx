@@ -23,11 +23,8 @@ const DashboardSingleCategory = ({
   const router = useRouter();
 
   const deleteCategory = async () => {
-    const requestOptions = {
-      method: "DELETE",
-    };
     // sending API request for deleting a category
-    apiClient.delete(`/api/categories/${id}`, requestOptions)
+    apiClient.delete(`/api/categories/${id}`)
       .then((response) => {
         if (response.status === 204) {
           toast.success("Category deleted successfully");
@@ -45,11 +42,7 @@ const DashboardSingleCategory = ({
     if (categoryInput.name.length > 0) {
       // sending API request for updating a category
       apiClient.put(`/api/categories/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: convertCategoryNameToURLFriendly(categoryInput.name),
-        }),
+        name: convertCategoryNameToURLFriendly(categoryInput.name),
       })
         .then((response) => {
           if (response.status === 200) {

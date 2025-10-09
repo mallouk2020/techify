@@ -14,11 +14,7 @@ const DashboardNewCategoryPage = () => {
     if (categoryInput.name.length > 0) {
       // sending API request for creating new cateogry
       apiClient.post(`/api/categories`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: convertCategoryNameToURLFriendly(categoryInput.name),
-        }),
+        name: convertCategoryNameToURLFriendly(categoryInput.name),
       })
         .then((response) => {
           if (response.status === 201) {
