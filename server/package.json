@@ -8,16 +8,7 @@
     "start": "node app.js",
     "build": "prisma generate",
     "postinstall": "prisma generate",
-    "logs": "node view-logs.js",
-    "logs:access": "node view-logs.js access",
-    "logs:error": "node view-logs.js error",
-    "logs:security": "node view-logs.js security",
-    "logs:analyze": "node view-logs.js analyze",
-    "migrate:validate": "node scripts/migration-validator.js validate",
-    "migrate:backup": "node scripts/migration-validator.js backup",
-    "migrate:safe": "node scripts/migration-validator.js safe-migrate",
-    "db:backup": "node scripts/backup-database.js",
-    "db:restore": "node scripts/restore-database.js"
+    "dev": "node app.js"
   },
   "keywords": [],
   "author": "",

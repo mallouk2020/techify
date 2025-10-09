@@ -77,6 +77,7 @@ async function createCustomerOrder(request, response) {
         country: validatedData.country,
         orderNotice: validatedData.orderNotice,
         total: validatedData.total,
+        paymentMethod: validatedData.paymentMethod || 'cash_on_delivery',
         dateTime: new Date()
       },
     });
@@ -186,6 +187,7 @@ async function updateCustomerOrder(request, response) {
         country: validatedData.country,
         orderNotice: validatedData.orderNotice,
         total: validatedData.total,
+        paymentMethod: validatedData.paymentMethod || 'cash_on_delivery',
       },
     });
 

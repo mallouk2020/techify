@@ -302,13 +302,24 @@ const orderValidation = {
   }
 };
 
-// Comprehensive order validation - FIXED VERSION
+// Comprehensive order validation - UPDATED for COD support
 const validateOrderData = (orderData) => {
   const errors = [];
   const validatedData = {};
 
+  // Check payment method (default to cash_on_delivery if not provided)
+  const paymentMethod = orderData.paymentMethod || 'cash_on_delivery';
+  const isCOD = paymentMethod === 'cash_on_delivery';
+  
+  validatedData.paymentMethod = paymentMethod;
+
   // Helper function to safely validate a field
-  const safeValidate = (validationFn, value, fieldName) => {
+  const safeValidate = (validationFn, value, fieldName, isOptional = false) => {
+    // Skip validation for optional fields if value is empty
+    if (isOptional && (!value || value.trim() === '')) {
+      return null;
+    }
+    
     try {
       return validationFn(value, fieldName);
     } catch (error) {
@@ -328,21 +339,40 @@ const validateOrderData = (orderData) => {
     }
   };
 
-  // Validate all required fields - ALL will be checked regardless of previous errors
+  // Required fields for ALL orders
   validatedData.name = safeValidate(orderValidation.validateName, orderData.name, 'name');
-  validatedData.lastname = safeValidate(orderValidation.validateName, orderData.lastname, 'lastname');
-  validatedData.email = safeValidate(orderValidation.validateEmail, orderData.email, 'email');
   validatedData.phone = safeValidate(orderValidation.validatePhone, orderData.phone, 'phone');
-  validatedData.company = safeValidate(orderValidation.validateAddress, orderData.company, 'company');
   validatedData.adress = safeValidate(orderValidation.validateAddress, orderData.adress, 'address');
-  validatedData.apartment = safeValidate(orderValidation.validateAddress, orderData.apartment, 'apartment');
   validatedData.city = safeValidate(orderValidation.validateAddress, orderData.city, 'city');
-  validatedData.country = safeValidate(orderValidation.validateAddress, orderData.country, 'country');
-  validatedData.postalCode = safeValidate(orderValidation.validatePostalCode, orderData.postalCode, 'postalCode');
   validatedData.total = safeValidate(orderValidation.validateTotal, orderData.total, 'total');
   validatedData.status = safeValidate(orderValidation.validateStatus, orderData.status || 'pending', 'status');
   
-  // Optional fields
+  // Email handling - optional for COD, but validate format if provided
+  if (isCOD) {
+    // For COD: email is optional, use default if not provided
+    if (orderData.email && orderData.email.trim() !== '' && orderData.email !== 'noemail@cod.order') {
+      validatedData.email = safeValidate(orderValidation.validateEmail, orderData.email, 'email', true);
+    } else {
+      validatedData.email = 'noemail@cod.order';
+    }
+    
+    // For COD: these fields are optional (set to null or default values)
+    validatedData.lastname = orderData.lastname?.trim() || null;
+    validatedData.company = orderData.company?.trim() || null;
+    validatedData.apartment = orderData.apartment?.trim() || null;
+    validatedData.country = orderData.country?.trim() || null;
+    validatedData.postalCode = orderData.postalCode?.trim() || null;
+  } else {
+    // For online payment: all fields are required
+    validatedData.email = safeValidate(orderValidation.validateEmail, orderData.email, 'email');
+    validatedData.lastname = safeValidate(orderValidation.validateName, orderData.lastname, 'lastname');
+    validatedData.company = safeValidate(orderValidation.validateAddress, orderData.company, 'company');
+    validatedData.apartment = safeValidate(orderValidation.validateAddress, orderData.apartment, 'apartment');
+    validatedData.country = safeValidate(orderValidation.validateAddress, orderData.country, 'country');
+    validatedData.postalCode = safeValidate(orderValidation.validatePostalCode, orderData.postalCode, 'postalCode');
+  }
+  
+  // Optional fields for all orders
   validatedData.orderNotice = orderData.orderNotice ? 
     orderData.orderNotice.trim().substring(0, 500) : ''; // Limit to 500 characters
 

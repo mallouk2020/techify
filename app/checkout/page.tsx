@@ -10,76 +10,50 @@ import apiClient from "@/lib/api";
 const CheckoutPage = () => {
   const [checkoutForm, setCheckoutForm] = useState({
     name: "",
-    lastname: "",
     phone: "",
     email: "",
-    company: "",
     adress: "",
-    apartment: "",
     city: "",
-    country: "",
-    postalCode: "",
     orderNotice: "",
   });
+  
+  const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { products, total, clearCart } = useProductStore();
   const router = useRouter();
 
-  // Add validation functions that match server requirements
+  // Simplified validation for COD orders
   const validateForm = () => {
     const errors: string[] = [];
     
-    // Name validation
+    // Name validation (full name)
     if (!checkoutForm.name.trim() || checkoutForm.name.trim().length < 2) {
-      errors.push("Name must be at least 2 characters");
-    }
-    
-    // Lastname validation
-    if (!checkoutForm.lastname.trim() || checkoutForm.lastname.trim().length < 2) {
-      errors.push("Lastname must be at least 2 characters");
-    }
-    
-    // Email validation
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (!checkoutForm.email.trim() || !emailRegex.test(checkoutForm.email.trim())) {
-      errors.push("Please enter a valid email address");
+      errors.push("الاسم الكامل يجب أن يكون على الأقل حرفين");
     }
     
     // Phone validation (must be at least 10 digits)
     const phoneDigits = checkoutForm.phone.replace(/[^0-9]/g, '');
     if (!checkoutForm.phone.trim() || phoneDigits.length < 10) {
-      errors.push("Phone number must be at least 10 digits");
+      errors.push("رقم الهاتف يجب أن يحتوي على 10 أرقام على الأقل");
     }
     
-    // Company validation
-    if (!checkoutForm.company.trim() || checkoutForm.company.trim().length < 5) {
-      errors.push("Company must be at least 5 characters");
+    // Email validation (optional - only validate if provided)
+    if (checkoutForm.email.trim()) {
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      if (!emailRegex.test(checkoutForm.email.trim())) {
+        errors.push("البريد الإلكتروني غير صحيح");
+      }
     }
     
     // Address validation
     if (!checkoutForm.adress.trim() || checkoutForm.adress.trim().length < 5) {
-      errors.push("Address must be at least 5 characters");
-    }
-    
-    // Apartment validation (updated to 1 character minimum)
-    if (!checkoutForm.apartment.trim() || checkoutForm.apartment.trim().length < 1) {
-      errors.push("Apartment is required");
+      errors.push("العنوان يجب أن يكون على الأقل 5 أحرف");
     }
     
     // City validation
-    if (!checkoutForm.city.trim() || checkoutForm.city.trim().length < 5) {
-      errors.push("City must be at least 5 characters");
-    }
-    
-    // Country validation
-    if (!checkoutForm.country.trim() || checkoutForm.country.trim().length < 5) {
-      errors.push("Country must be at least 5 characters");
-    }
-    
-    // Postal code validation
-    if (!checkoutForm.postalCode.trim() || checkoutForm.postalCode.trim().length < 3) {
-      errors.push("Postal code must be at least 3 characters");
+    if (!checkoutForm.city.trim() || checkoutForm.city.trim().length < 2) {
+      errors.push("المدينة يجب أن تكون على الأقل حرفين");
     }
     
     return errors;
@@ -95,28 +69,13 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Basic client-side checks for required fields (UX only)
-    const requiredFields = [
-      'name', 'lastname', 'phone', 'email', 'company', 
-      'adress', 'apartment', 'city', 'country', 'postalCode'
-    ];
-    
-    const missingFields = requiredFields.filter(field => 
-      !checkoutForm[field as keyof typeof checkoutForm]?.trim()
-    );
-
-    if (missingFields.length > 0) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     if (products.length === 0) {
-      toast.error("Your cart is empty");
+      toast.error("سلة التسوق فارغة");
       return;
     }
 
     if (total <= 0) {
-      toast.error("Invalid order total");
+      toast.error("إجمالي الطلب غير صحيح");
       return;
     }
 
@@ -125,21 +84,17 @@ const CheckoutPage = () => {
     try {
       console.log("🚀 Starting order creation...");
       
-      // Prepare the order data
+      // Prepare the simplified order data for COD
       const orderData = {
         name: checkoutForm.name.trim(),
-        lastname: checkoutForm.lastname.trim(),
         phone: checkoutForm.phone.trim(),
-        email: checkoutForm.email.trim().toLowerCase(),
-        company: checkoutForm.company.trim(),
+        email: checkoutForm.email.trim() || "noemail@cod.order", // Default email for COD orders
         adress: checkoutForm.adress.trim(),
-        apartment: checkoutForm.apartment.trim(),
-        postalCode: checkoutForm.postalCode.trim(),
+        city: checkoutForm.city.trim(),
+        orderNotice: checkoutForm.orderNotice.trim(),
+        paymentMethod: paymentMethod,
         status: "pending",
         total: total,
-        city: checkoutForm.city.trim(),
-        country: checkoutForm.country.trim(),
-        orderNotice: checkoutForm.orderNotice.trim(),
       };
 
       console.log("📋 Order data being sent:", orderData);
@@ -210,23 +165,18 @@ const CheckoutPage = () => {
       // Clear form and cart
       setCheckoutForm({
         name: "",
-        lastname: "",
         phone: "",
         email: "",
-        company: "",
         adress: "",
-        apartment: "",
         city: "",
-        country: "",
-        postalCode: "",
         orderNotice: "",
       });
       clearCart();
       
-      toast.success("Order created successfully! You will be contacted for payment.");
+      toast.success("تم إنشاء الطلب بنجاح! سيتم التواصل معك للتأكيد والدفع عند الاستلام.");
       setTimeout(() => {
         router.push("/");
-      }, 1000);
+      }, 2000);
     } catch (error: any) {
       console.error("💥 Error in makePurchase:", error);
       
@@ -376,7 +326,7 @@ const CheckoutPage = () => {
                 id="contact-info-heading"
                 className="text-lg font-medium text-gray-900"
               >
-                Contact information
+                معلومات الاتصال
               </h2>
 
               <div className="mt-6">
@@ -384,7 +334,7 @@ const CheckoutPage = () => {
                   htmlFor="name-input"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Name * (min 2 characters)
+                  الاسم الكامل *
                 </label>
                 <div className="mt-1">
                   <input
@@ -398,36 +348,10 @@ const CheckoutPage = () => {
                     type="text"
                     id="name-input"
                     name="name-input"
-                    autoComplete="given-name"
+                    autoComplete="name"
                     required
                     disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="lastname-input"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Lastname * (min 2 characters)
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={checkoutForm.lastname}
-                    onChange={(e) =>
-                      setCheckoutForm({
-                        ...checkoutForm,
-                        lastname: e.target.value,
-                      })
-                    }
-                    type="text"
-                    id="lastname-input"
-                    name="lastname-input"
-                    autoComplete="family-name"
-                    required
-                    disabled={isSubmitting}
+                    placeholder="أدخل اسمك الكامل"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -438,7 +362,7 @@ const CheckoutPage = () => {
                   htmlFor="phone-input"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Phone number * (min 10 digits)
+                  رقم الهاتف *
                 </label>
                 <div className="mt-1">
                   <input
@@ -455,6 +379,7 @@ const CheckoutPage = () => {
                     autoComplete="tel"
                     required
                     disabled={isSubmitting}
+                    placeholder="مثال: 0501234567"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -465,7 +390,7 @@ const CheckoutPage = () => {
                   htmlFor="email-address"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Email address *
+                  البريد الإلكتروني (اختياري)
                 </label>
                 <div className="mt-1">
                   <input
@@ -480,29 +405,76 @@ const CheckoutPage = () => {
                     id="email-address"
                     name="email-address"
                     autoComplete="email"
-                    required
                     disabled={isSubmitting}
+                    placeholder="example@email.com"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
             </section>
 
-            {/* Payment Notice */}
+            {/* Payment Method */}
             <section className="mt-10">
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+              <h2 className="text-lg font-medium text-gray-900">
+                طريقة الدفع
+              </h2>
+              
+              <div className="mt-6 space-y-4">
+                {/* Cash on Delivery - Active */}
+                <div className="relative flex items-start">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="cash-on-delivery"
+                      name="payment-method"
+                      type="radio"
+                      checked={paymentMethod === "cash_on_delivery"}
+                      onChange={() => setPaymentMethod("cash_on_delivery")}
+                      disabled={isSubmitting}
+                      className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm leading-6">
+                    <label htmlFor="cash-on-delivery" className="font-medium text-gray-900">
+                      الدفع عند الاستلام 💵
+                    </label>
+                    <p className="text-gray-500">ادفع نقداً عند استلام طلبك</p>
+                  </div>
+                </div>
+
+                {/* Online Payment - Disabled */}
+                <div className="relative flex items-start opacity-50">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="online-payment"
+                      name="payment-method"
+                      type="radio"
+                      disabled={true}
+                      className="h-4 w-4 border-gray-300 text-gray-400 cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm leading-6">
+                    <label htmlFor="online-payment" className="font-medium text-gray-400 cursor-not-allowed">
+                      الدفع الإلكتروني 💳
+                    </label>
+                    <p className="text-gray-400">غير متوفر حالياً</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* COD Notice */}
+              <div className="mt-6 bg-green-50 border border-green-200 rounded-md p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800">
-                      Payment Information
+                    <h3 className="text-sm font-medium text-green-800">
+                      الدفع عند الاستلام
                     </h3>
-                    <div className="mt-2 text-sm text-blue-700">
-                      <p>Payment will be processed after order confirmation. You will be contacted for payment details.</p>
+                    <div className="mt-2 text-sm text-green-700">
+                      <p>سيتم التواصل معك لتأكيد الطلب. الدفع نقداً عند استلام المنتجات.</p>
                     </div>
                   </div>
                 </div>
@@ -515,42 +487,16 @@ const CheckoutPage = () => {
                 id="shipping-heading"
                 className="text-lg font-medium text-gray-900"
               >
-                Shipping address
+                عنوان التوصيل
               </h2>
 
-              <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="company"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.company}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          company: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
+              <div className="mt-6 space-y-6">
+                <div>
                   <label
                     htmlFor="address"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Address *
+                    العنوان *
                   </label>
                   <div className="mt-1">
                     <input
@@ -560,6 +506,7 @@ const CheckoutPage = () => {
                       autoComplete="street-address"
                       required
                       disabled={isSubmitting}
+                      placeholder="مثال: شارع الملك فهد، حي النزهة"
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.adress}
                       onChange={(e) =>
@@ -572,38 +519,12 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="apartment"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Apartment, suite, etc. * (required)
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="apartment"
-                      name="apartment"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.apartment}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          apartment: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
                 <div>
                   <label
                     htmlFor="city"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    City *
+                    المدينة *
                   </label>
                   <div className="mt-1">
                     <input
@@ -613,6 +534,7 @@ const CheckoutPage = () => {
                       autoComplete="address-level2"
                       required
                       disabled={isSubmitting}
+                      placeholder="مثال: الرياض، جدة، الدمام"
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       value={checkoutForm.city}
                       onChange={(e) =>
@@ -627,72 +549,19 @@ const CheckoutPage = () => {
 
                 <div>
                   <label
-                    htmlFor="region"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Country *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="region"
-                      name="region"
-                      autoComplete="address-level1"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.country}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          country: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="postal-code"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Postal code *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="postal-code"
-                      name="postal-code"
-                      autoComplete="postal-code"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.postalCode}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          postalCode: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
                     htmlFor="order-notice"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Order notice
+                    ملاحظات (اختياري)
                   </label>
                   <div className="mt-1">
                     <textarea
-                      className="textarea textarea-bordered textarea-lg w-full disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      rows={4}
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                       id="order-notice"
                       name="order-notice"
-                      autoComplete="order-notice"
                       disabled={isSubmitting}
+                      placeholder="أي ملاحظات إضافية حول طلبك..."
                       value={checkoutForm.orderNotice}
                       onChange={(e) =>
                         setCheckoutForm({
@@ -711,9 +580,9 @@ const CheckoutPage = () => {
                 type="button"
                 onClick={makePurchase}
                 disabled={isSubmitting}
-                className="w-full rounded-md border border-transparent bg-blue-500 px-20 py-2 text-lg font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full rounded-md border border-transparent bg-green-600 px-20 py-3 text-lg font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? "Processing Order..." : "Place Order"}
+                {isSubmitting ? "جاري معالجة الطلب..." : "تأكيد الطلب 🛒"}
               </button>
             </div>
           </div>
