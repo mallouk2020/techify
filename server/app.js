@@ -64,6 +64,7 @@ app.use(errorLogger);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'https://techify-beta.vercel.app',
   process.env.NEXTAUTH_URL,
   process.env.FRONTEND_URL,
 ].filter(Boolean); // Remove undefined values
@@ -166,9 +167,15 @@ app.use((err, req, res, next) => {
   handleServerError(err, res, `${req.method} ${req.path}`);
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Rate limiting and request logging enabled for all endpoints');
-  console.log('Logs are being written to server/logs/ directory');
-});
+// Export for Vercel serverless
+module.exports = app;
+
+// Only start server if not in serverless environment
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log('Rate limiting and request logging enabled for all endpoints');
+    console.log('Logs are being written to server/logs/ directory');
+  });
+}
