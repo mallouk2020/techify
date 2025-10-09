@@ -112,7 +112,7 @@ const searchLimiter = rateLimit({
 // Rate limiter for order operations
 const orderLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 15 order operations per windowMs
+  max: 100, // Limit each IP to 100 order operations per windowMs
   message: {
     error: 'Too many order operations, please try again later.',
     retryAfter: '15 minutes'

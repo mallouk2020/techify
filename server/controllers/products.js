@@ -352,22 +352,28 @@ const deleteProduct = asyncHandler(async (request, response) => {
     throw new AppError("Product ID is required", 400);
   }
 
-  // Check for related records in order_product table
-  const relatedOrderProductItems = await prisma.customer_order_product.findMany({
+  // Delete all related records first to avoid foreign key constraint errors
+  // 1. Delete from customer_order_product (order items)
+  await prisma.customer_order_product.deleteMany({
     where: {
       productId: id,
     },
   });
-  
-  if(relatedOrderProductItems.length > 0){
-    throw new AppError("Cannot delete product because of foreign key constraint", 400);
-  }
 
+  // 2. Delete from Wishlist (handled by onDelete: Cascade in schema, but we'll be explicit)
+  await prisma.wishlist.deleteMany({
+    where: {
+      productId: id,
+    },
+  });
+
+  // 3. Now delete the product itself
   await prisma.product.delete({
     where: {
       id,
     },
   });
+  
   return response.status(204).send();
 });
 
