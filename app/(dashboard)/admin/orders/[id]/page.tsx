@@ -349,8 +349,7 @@ const AdminSingleOrder = () => {
           {orderProducts?.map((product) => (
             <div className="flex items-center gap-x-4" key={product?.id}>
               <Image
-                // src={product?.product?.mainImage ? `/${product?.product?.mainImage}` : "/product_placeholder.jpg"}
-                src={product?.mainImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${product.mainImage}`:"/product_placeholder.jpg"}
+                src={product?.mainImage || "/product_placeholder.jpg"}
                 alt={product?.product?.title}
                 width={50}
                 height={50}

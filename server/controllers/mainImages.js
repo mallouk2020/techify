@@ -1,11 +1,8 @@
 // server/controllers/mainImages.js
-const path = require("path");
-const fs = require("fs");
-const { v4: uuidv4 } = require("uuid"); // نحتاج لتوليد أسماء فريدة
+const cloudinary = require("../config/cloudinary");
+const { v4: uuidv4 } = require("uuid");
 
-// تأكد من تثبيت uuid: npm install uuid
-
-const uploadMainImage = (req, res) => {
+const uploadMainImage = async (req, res) => {
   try {
     if (!req.files || !req.files.uploadedFile) {
       return res.status(400).json({
@@ -16,7 +13,7 @@ const uploadMainImage = (req, res) => {
 
     const file = req.files.uploadedFile;
 
-    // التحقق من نوع الملف (اختياري لكن موصى به)
+    // التحقق من نوع الملف
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
     if (!allowedTypes.includes(file.mimetype)) {
       return res.status(400).json({
@@ -25,43 +22,31 @@ const uploadMainImage = (req, res) => {
       });
     }
 
-    // إنشاء اسم فريد للملف
-    const fileExtension = path.extname(file.name).toLowerCase();
-    const uniqueFilename = `${Date.now()}-${uuidv4()}${fileExtension}`;
-    
-    // مسار الحفظ
-    const uploadDir = path.join(__dirname, "..", "public", "uploads");
-    
-    // تأكد من وجود المجلد
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const uploadPath = path.join(uploadDir, uniqueFilename);
-
-    // حفظ الملف
-    file.mv(uploadPath, (err) => {
-      if (err) {
-        console.error("File move error:", err);
-        return res.status(500).json({
-          success: false,
-          message: "File upload failed",
-          error: err.message
-        });
-      }
-
-      // ✅ إرجاع الاستجابة بالشكل المتوقع في الواجهة
-      res.status(200).json({
-        success: true,
-        filename: uniqueFilename, // ← الاسم الفعلي على السيرفر
-        message: "File uploaded successfully"
-      });
+    // رفع الصورة إلى Cloudinary
+    const result = await cloudinary.uploader.upload(file.tempFilePath || file.data, {
+      folder: "techify/products", // مجلد في Cloudinary
+      public_id: `product-${Date.now()}-${uuidv4()}`, // اسم فريد
+      resource_type: "image",
+      transformation: [
+        { width: 1000, height: 1000, crop: "limit" }, // تصغير الصورة إذا كانت كبيرة
+        { quality: "auto" } // ضغط تلقائي
+      ]
     });
+
+    // ✅ إرجاع رابط الصورة من Cloudinary
+    res.status(200).json({
+      success: true,
+      filename: result.secure_url, // ← رابط الصورة الكامل من Cloudinary
+      publicId: result.public_id, // ← معرف الصورة (للحذف لاحقاً)
+      message: "File uploaded successfully"
+    });
+
   } catch (error) {
     console.error("Unexpected error in uploadMainImage:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error"
+      message: "Internal server error",
+      error: error.message
     });
   }
 };

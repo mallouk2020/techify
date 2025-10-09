@@ -14,6 +14,16 @@ const nextConfig = {
         port: '3001',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'techify-production.up.railway.app',
+        pathname: '/uploads/**',
+      },
         ],
       },
     env: {

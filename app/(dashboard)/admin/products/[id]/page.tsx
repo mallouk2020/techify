@@ -282,8 +282,7 @@ const DashboardProductDetails = ({
 
           {product?.mainImage && (
             <Image
-              // src={`/` + product?.mainImage}
-              src={product?.mainImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${product.mainImage}`:"/product_placeholder.jpg"}
+              src={product?.mainImage || "/product_placeholder.jpg"}
               alt={product?.title}
               className="w-auto h-auto mt-2"
               width={100}

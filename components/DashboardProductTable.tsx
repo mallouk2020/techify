@@ -80,7 +80,7 @@ const DashboardProductTable = () => {
                           <Image
                             width={48}
                             height={48}
-                            src={product?.mainImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${product.mainImage}` : "/product_placeholder.jpg"}
+                            src={product?.mainImage || "/product_placeholder.jpg"}
                             alt={sanitize(product?.title) || "Product image"}
                             className="w-auto h-auto"
                           />

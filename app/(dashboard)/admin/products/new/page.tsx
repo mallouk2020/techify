@@ -258,16 +258,17 @@ const AddNewProduct = () => {
             {product?.mainImage && (
               <div className="mt-2">
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${product.mainImage}`}
-                  alt={product.title}
+                  src={product.mainImage}
+                  alt={product.title || "Product preview"}
                   width={100}
                   height={100}
                   className="object-cover rounded border"
                   onError={(e) => {
-                    console.error("فشل تحميل الصورة من السيرفر:", e);
-                    (e.target as HTMLImageElement).src = "/placeholder-image.png"; // صورة افتراضية اختيارية
+                    console.error("فشل تحميل الصورة:", e);
+                    (e.target as HTMLImageElement).src = "/product_placeholder.jpg";
                   }}
                 />
+                <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
               </div>
             )}
           </label>
