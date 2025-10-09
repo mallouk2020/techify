@@ -1,6 +1,11 @@
 // server/controllers/mainImages.js
 const cloudinary = require("../config/cloudinary");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
+
+// دالة بديلة لتوليد UUID
+const generateUUID = () => {
+  return crypto.randomBytes(16).toString('hex');
+};
 
 const uploadMainImage = async (req, res) => {
   try {
@@ -45,7 +50,7 @@ const uploadMainImage = async (req, res) => {
     // رفع الصورة إلى Cloudinary
     const result = await cloudinary.uploader.upload(file.tempFilePath, {
       folder: "techify/products",
-      public_id: `product-${Date.now()}-${uuidv4()}`,
+      public_id: `product-${Date.now()}-${generateUUID()}`,
       resource_type: "image",
       transformation: [
         { width: 1000, height: 1000, crop: "limit" },
