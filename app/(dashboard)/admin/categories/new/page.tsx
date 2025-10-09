@@ -12,15 +12,14 @@ const DashboardNewCategoryPage = () => {
 
   const addNewCategory = () => {
     if (categoryInput.name.length > 0) {
-      const requestOptions = {
-        method: "post",
+      // sending API request for creating new cateogry
+      apiClient.post(`/api/categories`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: convertCategoryNameToURLFriendly(categoryInput.name),
         }),
-      };
-      // sending API request for creating new cateogry
-      apiClient.post(`/api/categories`, requestOptions)
+      })
         .then((response) => {
           if (response.status === 201) {
             return response.json();
@@ -35,6 +34,7 @@ const DashboardNewCategoryPage = () => {
           });
         })
         .catch((error) => {
+          console.error("Category creation error:", error);
           toast.error("There was an error while creating category");
         });
     } else {

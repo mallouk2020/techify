@@ -43,15 +43,14 @@ const DashboardSingleCategory = ({
 
   const updateCategory = async () => {
     if (categoryInput.name.length > 0) {
-      const requestOptions = {
+      // sending API request for updating a category
+      apiClient.put(`/api/categories/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: convertCategoryNameToURLFriendly(categoryInput.name),
         }),
-      };
-      // sending API request for updating a category
-      apiClient.put(`/api/categories/${id}`, requestOptions)
+      })
         .then((response) => {
           if (response.status === 200) {
             return response.json();
@@ -61,6 +60,7 @@ const DashboardSingleCategory = ({
         })
         .then((data) => toast.success("Category successfully updated"))
         .catch((error) => {
+          console.error("Category update error:", error);
           toast.error("There was an error while updating a category");
         });
     } else {

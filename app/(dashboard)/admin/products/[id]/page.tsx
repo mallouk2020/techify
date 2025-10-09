@@ -89,7 +89,7 @@ const DashboardProductDetails = ({
     formData.append("uploadedFile", file);
 
     try {
-      const response = await apiClient.post("/api/main-image", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/main-image`, {
         method: "POST",
         body: formData,
       });
@@ -102,7 +102,9 @@ const DashboardProductDetails = ({
           toast.success("Image uploaded successfully");
         }
       } else {
-        toast.error("File upload unsuccessful.");
+        const errorData = await response.json();
+        console.error("Upload error:", errorData);
+        toast.error(errorData.message || "File upload unsuccessful.");
       }
     } catch (error) {
       console.error("There was an error while during request sending:", error);
