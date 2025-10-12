@@ -53,13 +53,13 @@ const Products = async ({ params, searchParams }: { params: { slug?: string[] },
   const products = await data.json();
 
   return (
-    <div className="grid grid-cols-3 justify-items-center gap-x-2 gap-y-5 max-[1300px]:grid-cols-3 max-lg:grid-cols-2 max-[500px]:grid-cols-1">
+    <div className="grid grid-cols-2 gap-1.5 max-[420px]:gap-1 sm:gap-2 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6">
       {products.length > 0 ? (
         products.map((product: Product) => (
           <ProductItem key={product.id} product={product} color="black" />
         ))
       ) : (
-        <h3 className="text-3xl mt-5 text-center w-full col-span-full max-[1000px]:text-2xl max-[500px]:text-lg">
+        <h3 className="col-span-full mt-5 text-center text-3xl max-xl:text-2xl max-sm:text-lg">
           No products found for specified query
         </h3>
       )}

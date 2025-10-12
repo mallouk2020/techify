@@ -33,19 +33,14 @@ const AdminSingleOrder = () => {
   const [order, setOrder] = useState<Order>({
     id: "",
     adress: "",
-    apartment: "",
-    company: "",
-    dateTime: "",
     email: "",
-    lastname: "",
     name: "",
     phone: "",
-    postalCode: "",
     city: "",
-    country: "",
     orderNotice: "",
     status: "processing",
     total: 0,
+    paymentMethod: "",
   });
   const params = useParams<{ id: string }>();
 
@@ -75,23 +70,13 @@ const AdminSingleOrder = () => {
   const updateOrder = async () => {
     if (
       order?.name.length > 0 &&
-      order?.lastname.length > 0 &&
       order?.phone.length > 0 &&
       order?.email.length > 0 &&
-      order?.company.length > 0 &&
       order?.adress.length > 0 &&
-      order?.apartment.length > 0 &&
-      order?.city.length > 0 &&
-      order?.country.length > 0 &&
-      order?.postalCode.length > 0
+      order?.city.length > 0
     ) {
       if (!isValidNameOrLastname(order?.name)) {
         toast.error("You entered invalid name format");
-        return;
-      }
-
-      if (!isValidNameOrLastname(order?.lastname)) {
-        toast.error("You entered invalid lastname format");
         return;
       }
 
@@ -112,7 +97,7 @@ const AdminSingleOrder = () => {
           toast.error("There was an error while updating a order")
         );
     } else {
-      toast.error("Please fill all fields");
+      toast.error("Please fill all required fields");
     }
   };
 
@@ -142,35 +127,18 @@ const AdminSingleOrder = () => {
             </div>
           </label>
         </div>
-        <div className="flex gap-x-2 max-sm:flex-col">
-          <div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Name:</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                value={order?.name}
-                onChange={(e) => setOrder({ ...order, name: e.target.value })}
-              />
-            </label>
-          </div>
-          <div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Lastname:</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                value={order?.lastname}
-                onChange={(e) =>
-                  setOrder({ ...order, lastname: e.target.value })
-                }
-              />
-            </label>
-          </div>
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Full Name:</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={order?.name}
+              onChange={(e) => setOrder({ ...order, name: e.target.value })}
+            />
+          </label>
         </div>
 
         <div>
@@ -190,27 +158,13 @@ const AdminSingleOrder = () => {
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
-              <span className="label-text">Email adress:</span>
+              <span className="label-text">Email address:</span>
             </div>
             <input
               type="email"
               className="input input-bordered w-full max-w-xs"
               value={order?.email}
               onChange={(e) => setOrder({ ...order, email: e.target.value })}
-            />
-          </label>
-        </div>
-
-        <div>
-          <label className="form-control w-full max-w-xs">
-            <div className="label">
-              <span className="label-text">Company (optional):</span>
-            </div>
-            <input
-              type="text"
-              className="input input-bordered w-full max-w-xs"
-              value={order?.company}
-              onChange={(e) => setOrder({ ...order, company: e.target.value })}
             />
           </label>
         </div>
@@ -233,24 +187,6 @@ const AdminSingleOrder = () => {
           <div>
             <label className="form-control w-full max-w-xs">
               <div className="label">
-                <span className="label-text">Apartment, suite, etc. :</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                value={order?.apartment}
-                onChange={(e) =>
-                  setOrder({ ...order, apartment: e.target.value })
-                }
-              />
-            </label>
-          </div>
-        </div>
-
-        <div className="flex gap-x-2 max-sm:flex-col">
-          <div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
                 <span className="label-text">City:</span>
               </div>
               <input
@@ -261,38 +197,21 @@ const AdminSingleOrder = () => {
               />
             </label>
           </div>
+        </div>
 
-          <div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Country:</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                value={order?.country}
-                onChange={(e) =>
-                  setOrder({ ...order, country: e.target.value })
-                }
-              />
-            </label>
-          </div>
-
-          <div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Postal Code:</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                value={order?.postalCode}
-                onChange={(e) =>
-                  setOrder({ ...order, postalCode: e.target.value })
-                }
-              />
-            </label>
-          </div>
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Payment Method:</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={order?.paymentMethod}
+              onChange={(e) => setOrder({ ...order, paymentMethod: e.target.value })}
+              disabled
+            />
+          </label>
         </div>
 
         <div>
@@ -354,11 +273,11 @@ const AdminSingleOrder = () => {
             </div>
           ))}
           <div className="flex flex-col gap-y-2 mt-10">
-            <p className="text-2xl">Subtotal: ${order?.total}</p>
-            <p className="text-2xl">Tax 20%: ${order?.total / 5}</p>
-            <p className="text-2xl">Shipping: $5</p>
-            <p className="text-3xl font-semibold">
-              Total: ${order?.total + order?.total / 5 + 5}
+            <p className="text-2xl font-semibold">
+              Order Total: ${order?.total}
+            </p>
+            <p className="text-sm text-gray-600 mt-2">
+              * Total includes all discounts and shipping costs calculated at checkout
             </p>
           </div>
           <div className="flex gap-x-2 max-sm:flex-col mt-5">

@@ -28,25 +28,29 @@ const ShopPage = async ({ params, searchParams }: { params: Promise<{ slug?: str
   const awaitedSearchParams = await searchParams;
   
   return (
-    <div className="text-black bg-white">
-      <div className=" max-w-screen-2xl mx-auto px-10 max-sm:px-5">
+    <div className="bg-gray-100 text-slate-900 min-h-screen py-10">
+      <div className="max-w-[1200px] mx-auto px-6 sm:px-10 lg:px-12">
         <Breadcrumb />
-        <div className="grid grid-cols-[200px_1fr] gap-x-10 max-md:grid-cols-1 max-md:gap-y-5">
-          <Filters />
-          <div>
-            <div className="flex justify-between items-center max-lg:flex-col max-lg:gap-y-5">
-              <h2 className="text-2xl font-bold max-sm:text-xl max-[400px]:text-lg uppercase">
+        <div className="grid grid-cols-[260px_1fr] gap-10 xl:grid-cols-[240px_1fr] lg:grid-cols-[220px_1fr] max-lg:grid-cols-1">
+          <aside className="bg-white rounded-xl shadow-sm border border-slate-200 sticky top-24 h-fit max-lg:static max-lg:p-0 max-lg:shadow-none max-lg:border-transparent">
+            <div className="p-6 max-lg:p-0">
+              <Filters />
+            </div>
+          </aside>
+          <section className="flex flex-col gap-8">
+            <header className="flex items-center justify-between gap-6 flex-wrap">
+              <h2 className="text-3xl font-semibold text-slate-900 max-md:text-2xl max-sm:text-xl">
                 {awaitedParams?.slug && awaitedParams?.slug[0]?.length > 0
                   ? sanitize(improveCategoryText(awaitedParams?.slug[0]))
                   : "All products"}
               </h2>
-
               <SortBy />
-            </div>
-            <div className="divider"></div>
+            </header>
             <Products params={awaitedParams} searchParams={awaitedSearchParams} />
-            <Pagination />
-          </div>
+            <div className="pt-4 border-t border-slate-200">
+              <Pagination />
+            </div>
+          </section>
         </div>
       </div>
     </div>

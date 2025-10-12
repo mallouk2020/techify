@@ -265,10 +265,17 @@ const createProduct = asyncHandler(async (request, response) => {
     title,
     mainImage,
     price,
+    oldPrice,
+    rating,
+    ratingCount,
     description,
     manufacturer,
     categoryId,
     inStock,
+    stock,
+    colors,
+    sizes,
+    shippingCost,
   } = request.body;
 
   // Basic validation
@@ -282,11 +289,17 @@ const createProduct = asyncHandler(async (request, response) => {
       title,
       mainImage,
       price,
-      rating: 5,
+      oldPrice: oldPrice || null,
+      rating: rating || 0,
+      ratingCount: ratingCount || null,
       description,
       manufacturer,
       categoryId,
       inStock,
+      stock: stock || null,
+      colors: colors || null,
+      sizes: sizes || null,
+      shippingCost: shippingCost || null,
     },
   });
   return response.status(201).json(product);
@@ -300,11 +313,17 @@ const updateProduct = asyncHandler(async (request, response) => {
     title,
     mainImage,
     price,
+    oldPrice,
     rating,
+    ratingCount,
     description,
     manufacturer,
     categoryId,
     inStock,
+    stock,
+    colors,
+    sizes,
+    shippingCost,
   } = request.body;
 
   // Basic validation
@@ -333,11 +352,17 @@ const updateProduct = asyncHandler(async (request, response) => {
       mainImage: mainImage,
       slug: slug,
       price: price,
+      oldPrice: oldPrice !== undefined ? oldPrice : null,
       rating: rating,
+      ratingCount: ratingCount !== undefined ? ratingCount : null,
       description: description,
       manufacturer: manufacturer,
       categoryId: categoryId,
       inStock: inStock,
+      stock: stock !== undefined ? stock : null,
+      colors: colors !== undefined ? colors : null,
+      sizes: sizes !== undefined ? sizes : null,
+      shippingCost: shippingCost !== undefined ? shippingCost : null,
     },
   });
 

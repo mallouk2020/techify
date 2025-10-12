@@ -3,13 +3,19 @@ interface Product {
   slug: string;
   title: string;
   price: number;
+  oldPrice?: number;
   rating: number;
+  ratingCount?: number;
   description: string;
   mainImage: string;
   manufacturer: string;
   categoryId: string;
   category: {name: string}?;
   inStock: number;
+  stock?: number;
+  colors?: string;
+  sizes?: string;
+  shippingCost?: number;
 }
 
 interface SingleProductPageProps {
@@ -49,19 +55,15 @@ interface User {
 interface Order {
   id: string;
   adress: string;
-  apartment: string;
-  company: string;
-  dateTime: string;
   email: string;
-  lastname: string;
   name: string;
   phone: string;
-  postalCode: string;
-  status: "processing" | "canceled" | "delivered";
+  status: "processing" | "canceled" | "delivered" | "pending";
   city: string;
-  country: string;
-  orderNotice: string?;
+  orderNotice?: string;
   total: number;
+  paymentMethod?: string;
+  createdAt?: string;
 }
 
 interface SingleProductBtnProps {

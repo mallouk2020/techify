@@ -20,10 +20,16 @@ model Product {
   title          String
   mainImage      String
   price          Int                      @default(0)
+  oldPrice       Int?                     // السعر القديم (اختياري)
   rating         Int                      @default(0)
+  ratingCount    Int?                     // عدد التقييمات
   description    String
   manufacturer   String
   inStock        Int                      @default(1)
+  stock          Int?                     // عدد القطع المتوفرة
+  colors         String?                  // الألوان المتاحة (مفصولة بفواصل)
+  sizes          String?                  // الأحجام المتاحة (مفصولة بفواصل)
+  shippingCost   Int?                     // تكلفة التوصيل (إذا كانت فارغة = مجاني)
   categoryId     String
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customerOrders customer_order_product[]

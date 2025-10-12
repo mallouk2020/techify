@@ -41,38 +41,42 @@ const ProductTabs = ({ product }: { product: Product }) => {
           Additional info
         </a>
       </div>
-      <div className="pt-5">
+      <div className="pt-6">
         {currentProductTab === 0 && (
           <div 
-            className="text-lg max-sm:text-base max-sm:text-sm"
+            className="text-base leading-relaxed text-gray-700 max-sm:text-sm prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ 
               __html: sanitizeHtml(product?.description) 
+            }}
+            style={{
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word'
             }}
           />
         )}
 
         {currentProductTab === 1 && (
           <div className="overflow-x-auto">
-            <table className="table text-xl text-center max-[500px]:text-base">
+            <table className="table text-lg text-left max-[500px]:text-base border-collapse w-full">
               <tbody>
                 {/* row 1 */}
-                <tr>
-                  <th>Manufacturer:</th>
-                  <td>{sanitize(product?.manufacturer)}</td>
+                <tr className="border-b border-gray-200 hover:bg-gray-50">
+                  <th className="py-4 px-6 font-semibold text-gray-700 w-1/3">Manufacturer:</th>
+                  <td className="py-4 px-6 text-gray-600">{sanitize(product?.manufacturer)}</td>
                 </tr>
                 {/* row 2 */}
-                <tr>
-                  <th>Category:</th>
-                  <td>
+                <tr className="border-b border-gray-200 hover:bg-gray-50">
+                  <th className="py-4 px-6 font-semibold text-gray-700 w-1/3">Category:</th>
+                  <td className="py-4 px-6 text-gray-600">
                     {product?.category?.name
                       ? sanitize(formatCategoryName(product?.category?.name))
                       : "No category"}
                   </td>
                 </tr>
                 {/* row 3 */}
-                <tr>
-                  <th>Color:</th>
-                  <td>Silver, LightSlateGray, Blue</td>
+                <tr className="border-b border-gray-200 hover:bg-gray-50">
+                  <th className="py-4 px-6 font-semibold text-gray-700 w-1/3">Color:</th>
+                  <td className="py-4 px-6 text-gray-600">Silver, LightSlateGray, Blue</td>
                 </tr>
               </tbody>
             </table>

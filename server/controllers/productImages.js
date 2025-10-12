@@ -1,5 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
+const cloudinary = require("../config/cloudinary");
+const crypto = require("crypto");
 const prisma = new PrismaClient();
+
+// دالة بديلة لتوليد UUID
+const generateUUID = () => {
+  return crypto.randomBytes(16).toString('hex');
+};
 
 async function getSingleProductImages(request, response) {
   const { id } = request.params;
@@ -80,11 +87,150 @@ async function deleteImage(request, response) {
   }
 }
 
+// دالة جديدة لرفع صور متعددة للمنتج
+async function uploadProductImages(request, response) {
+  try {
+    const { productID } = request.body;
 
+    if (!productID) {
+      return response.status(400).json({
+        success: false,
+        message: "Product ID is required"
+      });
+    }
+
+    // التحقق من وجود الملفات
+    if (!request.files || !request.files.images) {
+      return response.status(400).json({
+        success: false,
+        message: "No images uploaded"
+      });
+    }
+
+    // تحويل الملفات إلى مصفوفة (في حالة رفع ملف واحد أو عدة ملفات)
+    const files = Array.isArray(request.files.images) 
+      ? request.files.images 
+      : [request.files.images];
+
+    console.log(`📁 Uploading ${files.length} images for product ${productID}`);
+
+    const uploadedImages = [];
+    const errors = [];
+
+    // رفع كل صورة إلى Cloudinary وحفظها في قاعدة البيانات
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      try {
+        // التحقق من نوع الملف
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+        if (!allowedTypes.includes(file.mimetype)) {
+          errors.push({
+            file: file.name,
+            error: "Invalid file type. Only jpg, png, webp allowed"
+          });
+          continue;
+        }
+
+        // رفع الصورة إلى Cloudinary
+        const result = await cloudinary.uploader.upload(file.tempFilePath, {
+          folder: "techify/products/gallery",
+          public_id: `product-${productID}-${Date.now()}-${generateUUID()}`,
+          resource_type: "image",
+          transformation: [
+            { width: 1000, height: 1000, crop: "limit" },
+            { quality: "auto" },
+            { fetch_format: "auto" }
+          ]
+        });
+
+        console.log(`✅ Image ${i + 1} uploaded: ${result.secure_url}`);
+
+        // حفظ الصورة في قاعدة البيانات
+        const savedImage = await prisma.image.create({
+          data: {
+            productID: productID,
+            image: result.secure_url,
+          },
+        });
+
+        uploadedImages.push({
+          imageID: savedImage.imageID,
+          url: result.secure_url,
+          publicId: result.public_id
+        });
+
+      } catch (error) {
+        console.error(`❌ Error uploading image ${file.name}:`, error);
+        errors.push({
+          file: file.name,
+          error: error.message
+        });
+      }
+    }
+
+    // إرجاع النتيجة
+    return response.status(201).json({
+      success: true,
+      message: `${uploadedImages.length} images uploaded successfully`,
+      images: uploadedImages,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    console.error("❌ Error in uploadProductImages:", error);
+    return response.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+}
+
+// دالة لحذف صورة واحدة بناءً على imageID
+async function deleteSingleImage(request, response) {
+  try {
+    const { imageID } = request.params;
+
+    // البحث عن الصورة
+    const image = await prisma.image.findUnique({
+      where: { imageID: imageID }
+    });
+
+    if (!image) {
+      return response.status(404).json({
+        success: false,
+        message: "Image not found"
+      });
+    }
+
+    // حذف الصورة من قاعدة البيانات
+    await prisma.image.delete({
+      where: { imageID: imageID }
+    });
+
+    console.log(`✅ Image ${imageID} deleted successfully`);
+
+    return response.status(200).json({
+      success: true,
+      message: "Image deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("❌ Error deleting single image:", error);
+    return response.status(500).json({
+      success: false,
+      message: "Error deleting image",
+      error: error.message
+    });
+  }
+}
 
 module.exports = {
   getSingleProductImages,
   createImage,
   updateImage,
   deleteImage,
+  uploadProductImages,
+  deleteSingleImage,
 };

@@ -129,21 +129,21 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
   return (
     <>
       {isProductInWishlist ? (
-        <p
-          className="flex items-center gap-x-2 cursor-pointer"
+        <button
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border-2 border-red-200"
           onClick={removeFromWishlistFun}
         >
-          <FaHeartCrack className="text-xl text-custom-black" />
-          <span className="text-lg">REMOVE FROM WISHLIST</span>
-        </p>
+          <FaHeartCrack className="text-xl" />
+          <span className="text-sm sm:text-base">إزالة من المفضلة</span>
+        </button>
       ) : (
-        <p
-          className="flex items-center gap-x-2 cursor-pointer"
+        <button
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border-2 border-pink-200"
           onClick={addToWishlistFun}
         >
-          <FaHeart className="text-xl text-custom-black" />
-          <span className="text-lg">ADD TO WISHLIST</span>
-        </p>
+          <FaHeart className="text-xl" />
+          <span className="text-sm sm:text-base">أضف إلى المفضلة</span>
+        </button>
       )}
     </>
   );

@@ -1,11 +1,52 @@
 // src/lib/api.ts
 import config from './config';
 
+const LOCAL_FALLBACK_ORIGIN =
+  process.env.NEXT_PUBLIC_LOCAL_API_ORIGIN || 'http://localhost:3001';
+
+const isAbsoluteUrl = (value: string) => /^https?:\/\//i.test(value);
+
+const ensureLeadingSlash = (value: string) =>
+  value.startsWith('/') ? value : `/${value}`;
+
+const trimTrailingSlash = (value: string) =>
+  (value.endsWith('/') ? value.slice(0, -1) : value);
+
 export const apiClient = {
   baseUrl: config.apiBaseUrl,
 
   async request(endpoint: string, options: RequestInit = {}) {
-    const url = `${this.baseUrl}${endpoint}`;
+    const requestIsAbsolute = isAbsoluteUrl(endpoint);
+    const normalizedEndpoint = requestIsAbsolute
+      ? endpoint
+      : ensureLeadingSlash(endpoint);
+
+    const isBrowser = typeof window !== 'undefined';
+
+    let resolvedBaseUrl = this.baseUrl;
+
+    if (!requestIsAbsolute) {
+      if (isBrowser) {
+        const hostname = window.location.hostname;
+        const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+        if (isLocalHost) {
+          resolvedBaseUrl = LOCAL_FALLBACK_ORIGIN;
+        }
+      } else {
+        const isHostedEnvironment = Boolean(
+          process.env.VERCEL || process.env.RAILWAY_STATIC_URL || process.env.AWS_REGION,
+        );
+
+        if (!isHostedEnvironment) {
+          resolvedBaseUrl =
+            process.env.LOCAL_API_ORIGIN || process.env.NEXT_PUBLIC_LOCAL_API_ORIGIN || LOCAL_FALLBACK_ORIGIN;
+        }
+      }
+    }
+
+    const base = trimTrailingSlash(resolvedBaseUrl);
+    const url = requestIsAbsolute ? normalizedEndpoint : `${base}${normalizedEndpoint}`;
 
     // اكتشف إذا كان الـ body من نوع FormData
     const isFormData = options.body instanceof FormData;

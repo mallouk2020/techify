@@ -81,21 +81,33 @@ export const CartModule = () => {
                   </div>
                 </div>
 
-                <p className="mt-4 flex space-x-2 text-sm text-gray-700">
-                  {1 ? (
-                    <FaCheck
-                      className="h-5 w-5 flex-shrink-0 text-green-500"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <FaClock
-                      className="h-5 w-5 flex-shrink-0 text-gray-300"
-                      aria-hidden="true"
-                    />
-                  )}
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <p className="flex space-x-2 text-sm text-gray-700">
+                    {1 ? (
+                      <FaCheck
+                        className="h-5 w-5 flex-shrink-0 text-green-500"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <FaClock
+                        className="h-5 w-5 flex-shrink-0 text-gray-300"
+                        aria-hidden="true"
+                      />
+                    )}
 
-                  <span>{1 ? "In stock" : `Ships in 3 days`}</span>
-                </p>
+                    <span>{1 ? "In stock" : `Ships in 3 days`}</span>
+                  </p>
+                  
+                  {/* Remove Button for Mobile */}
+                  <button
+                    onClick={() => handleRemoveItem(product.id)}
+                    type="button"
+                    className="sm:hidden inline-flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    <FaXmark className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Remove</span>
+                  </button>
+                </div>
               </div>
             </li>
           ))}

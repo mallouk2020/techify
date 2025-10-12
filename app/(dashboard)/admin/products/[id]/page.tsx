@@ -24,6 +24,7 @@ const DashboardProductDetails = ({
   const [product, setProduct] = useState<Product>();
   const [categories, setCategories] = useState<Category[]>();
   const [otherImages, setOtherImages] = useState<OtherImages[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const router = useRouter();
 
   // functionality for deleting product
@@ -132,6 +133,68 @@ const DashboardProductDetails = ({
       });
   };
 
+  // دالة رفع صور متعددة
+  const uploadMultipleImages = async (files: FileList) => {
+    if (!files || files.length === 0) {
+      toast.error("Please select images to upload");
+      return;
+    }
+
+    setUploadingImages(true);
+    const formData = new FormData();
+    
+    // إضافة معرف المنتج
+    formData.append("productID", id);
+    
+    // إضافة جميع الصور
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`${data.images.length} images uploaded successfully`);
+        
+        // إعادة تحميل الصور
+        fetchProductData();
+      } else {
+        const errorData = await response.json();
+        console.error("Upload error:", errorData);
+        toast.error(errorData.message || "Failed to upload images");
+      }
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Error uploading images");
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  // دالة حذف صورة واحدة
+  const deleteSingleImage = async (imageID: string | number) => {
+    try {
+      const response = await apiClient.delete(`/api/images/single/${imageID}`);
+      
+      if (response.ok) {
+        toast.success("Image deleted successfully");
+        // إعادة تحميل الصور
+        fetchProductData();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to delete image");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error("Error deleting image");
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
     fetchProductData();
@@ -164,7 +227,7 @@ const DashboardProductDetails = ({
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
-              <span className="label-text">Product price:</span>
+              <span className="label-text">Product price (Current):</span>
             </div>
             <input
               type="text"
@@ -177,6 +240,71 @@ const DashboardProductDetails = ({
           </label>
         </div>
         {/* Product price input div - end */}
+        
+        {/* Old Price input div - start */}
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Old price (Optional - for discount):</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={product?.oldPrice || ""}
+              placeholder="Leave empty if no discount"
+              onChange={(e) =>
+                setProduct({ ...product!, oldPrice: e.target.value ? Number(e.target.value) : undefined })
+              }
+            />
+          </label>
+        </div>
+        {/* Old Price input div - end */}
+        
+        {/* Rating and Rating Count - Side by Side */}
+        <div className="flex gap-x-2 max-sm:flex-col">
+          {/* Rating input div - start */}
+          <div>
+            <label className="form-control w-full max-w-xs">
+              <div className="label">
+                <span className="label-text">Rating (0-5):</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                className="input input-bordered w-full max-w-xs"
+                value={product?.rating || 0}
+                placeholder="e.g., 4.5"
+                onChange={(e) =>
+                  setProduct({ ...product!, rating: Number(e.target.value) })
+                }
+              />
+            </label>
+          </div>
+          {/* Rating input div - end */}
+
+          {/* Rating Count input div - start */}
+          <div>
+            <label className="form-control w-full max-w-xs">
+              <div className="label">
+                <span className="label-text">Number of ratings:</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                className="input input-bordered w-full max-w-xs"
+                value={product?.ratingCount || ""}
+                placeholder="e.g., 150"
+                onChange={(e) =>
+                  setProduct({ ...product!, ratingCount: e.target.value ? Number(e.target.value) : undefined })
+                }
+              />
+            </label>
+          </div>
+          {/* Rating Count input div - end */}
+        </div>
+        
         {/* Product manufacturer input div - start */}
         <div>
           <label className="form-control w-full max-w-xs">
@@ -235,6 +363,94 @@ const DashboardProductDetails = ({
           </label>
         </div>
         {/* Product inStock select input div - end */}
+        
+        {/* Colors input div - start */}
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Available colors (Optional):</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={product?.colors || ""}
+              placeholder="e.g., Red, Blue, Black"
+              onChange={(e) =>
+                setProduct({ ...product!, colors: e.target.value })
+              }
+            />
+            <div className="label">
+              <span className="label-text-alt text-gray-500">Comma separated: Red, Blue, Black</span>
+            </div>
+          </label>
+        </div>
+        {/* Colors input div - end */}
+        
+        {/* Sizes input div - start */}
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Available sizes (Optional):</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={product?.sizes || ""}
+              placeholder="e.g., S, M, L, XL"
+              onChange={(e) =>
+                setProduct({ ...product!, sizes: e.target.value })
+              }
+            />
+            <div className="label">
+              <span className="label-text-alt text-gray-500">Comma separated: S, M, L, XL</span>
+            </div>
+          </label>
+        </div>
+        {/* Sizes input div - end */}
+        
+        {/* Stock Quantity input div - start */}
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Stock quantity (Optional):</span>
+            </div>
+            <input
+              type="number"
+              className="input input-bordered w-full max-w-xs"
+              value={product?.stock || ""}
+              placeholder="e.g., 50"
+              onChange={(e) =>
+                setProduct({ ...product!, stock: e.target.value ? Number(e.target.value) : undefined })
+              }
+            />
+            <div className="label">
+              <span className="label-text-alt text-gray-500">Number of items available</span>
+            </div>
+          </label>
+        </div>
+        {/* Stock Quantity input div - end */}
+        
+        {/* Shipping Cost input div - start */}
+        <div>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Shipping cost (Optional):</span>
+            </div>
+            <input
+              type="number"
+              className="input input-bordered w-full max-w-xs"
+              value={product?.shippingCost || ""}
+              placeholder="Leave empty for free shipping"
+              onChange={(e) =>
+                setProduct({ ...product!, shippingCost: e.target.value ? Number(e.target.value) : undefined })
+              }
+            />
+            <div className="label">
+              <span className="label-text-alt text-gray-500">Leave empty for free shipping</span>
+            </div>
+          </label>
+        </div>
+        {/* Shipping Cost input div - end */}
         {/* Product category select input div - start */}
         <div>
           <label className="form-control w-full max-w-xs">
@@ -264,47 +480,83 @@ const DashboardProductDetails = ({
 
         {/* Main image file upload div - start */}
         <div>
+          <label className="block text-sm font-semibold mb-2">Main Product Image:</label>
           <input
-  type="file"
-  className="file-input file-input-bordered file-input-lg w-full max-w-sm"
-  onChange={(e) => {
-    const file = e.target.files?.[0]; // ✅ Optional Chaining: يتحقق من null تلقائيًا
-    if (file) {
-      uploadFile(file);
-      // ❌ لا تستخدم file.name هنا! لأن الاسم الحقيقي سيأتي من السيرفر
-      // setProduct({ ...product!, mainImage: file.name }); ← احذف هذا السطر
-    }
-  }}
-/>
-
-
-
+            type="file"
+            className="file-input file-input-bordered file-input-lg w-full max-w-sm"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                uploadFile(file);
+              }
+            }}
+          />
           {product?.mainImage && (
-            <Image
-              src={product?.mainImage || "/product_placeholder.jpg"}
-              alt={product?.title}
-              className="w-auto h-auto mt-2"
-              width={100}
-              height={100}
-            />
+            <div className="mt-3">
+              <Image
+                src={product?.mainImage || "/product_placeholder.jpg"}
+                alt={product?.title}
+                className="w-auto h-auto rounded-lg border-2 border-gray-200"
+                width={150}
+                height={150}
+              />
+            </div>
           )}
         </div>
         {/* Main image file upload div - end */}
-        {/* Other images file upload div - start */}
-        <div className="flex gap-x-1">
-          {otherImages &&
-            otherImages.map((image) => (
-              <Image
-                src={`/${image.image}`}
-                key={nanoid()}
-                alt="product image"
-                width={100}
-                height={100}
-                className="w-auto h-auto"
-              />
-            ))}
+
+        {/* Multiple images upload div - start */}
+        <div className="border-t pt-5">
+          <label className="block text-sm font-semibold mb-2">
+            Additional Product Images (Gallery):
+          </label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            className="file-input file-input-bordered file-input-lg w-full max-w-sm"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files) {
+                uploadMultipleImages(files);
+              }
+            }}
+            disabled={uploadingImages}
+          />
+          {uploadingImages && (
+            <p className="text-blue-500 mt-2">Uploading images...</p>
+          )}
+          
+          {/* عرض الصور الإضافية */}
+          {otherImages && otherImages.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-semibold mb-3">Current Gallery Images:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {otherImages.map((image) => (
+                  <div key={image.imageID} className="relative group">
+                    <Image
+                      src={image.image}
+                      alt="product gallery image"
+                      width={150}
+                      height={150}
+                      className="w-full h-auto rounded-lg border-2 border-gray-200 object-cover"
+                    />
+                    <button
+                      onClick={() => deleteSingleImage(image.imageID)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Delete image"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        {/* Other images file upload div - end */}
+        {/* Multiple images upload div - end */}
         {/* Product description div - start */}
         <div>
           <label className="form-control">

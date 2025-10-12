@@ -47,10 +47,10 @@ const ProductsSection = () => {
 
   if (loading) {
     return (
-      <div className="bg-blue-500 border-t-4 border-white">
-        <div className="max-w-screen-2xl mx-auto pt-20 pb-20">
+      <div className="bg-gray-100 border-t border-gray-200">
+        <div className="mx-auto max-w-screen-2xl py-16">
           <Heading title="FEATURED PRODUCTS" />
-          <div className="text-center text-white py-10">
+          <div className="py-10 text-center text-slate-600">
             <p>Loading products...</p>
           </div>
         </div>
@@ -60,10 +60,10 @@ const ProductsSection = () => {
 
   if (error || products.length === 0) {
     return (
-      <div className="bg-blue-500 border-t-4 border-white">
-        <div className="max-w-screen-2xl mx-auto pt-20 pb-20">
+      <div className="bg-gray-100 border-t border-gray-200">
+        <div className="mx-auto max-w-screen-2xl py-16">
           <Heading title="FEATURED PRODUCTS" />
-          <div className="text-center text-white py-10">
+          <div className="py-10 text-center text-slate-600">
             <p>Products will be available soon. Please check back later.</p>
           </div>
         </div>
@@ -72,12 +72,12 @@ const ProductsSection = () => {
   }
 
   return (
-    <div className="bg-blue-500 border-t-4 border-white">
-      <div className="max-w-screen-2xl mx-auto pt-20">
+    <div className="bg-gray-100 border-t border-gray-200">
+      <div className="max-w-screen-2xl mx-auto pt-20 pb-10">
         <Heading title="FEATURED PRODUCTS" />
-        <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+        <div className="grid grid-cols-2 gap-1.5 max-[420px]:gap-1 sm:gap-2 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 max-w-screen-2xl mx-auto py-10 px-10">
           {products.map((product: Product) => (
-            <ProductItem key={product.id} product={product} color="white" />
+            <ProductItem key={product.id} product={product} color="black" />
           ))}
         </div>
       </div>
