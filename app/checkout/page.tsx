@@ -19,40 +19,61 @@ const CheckoutPage = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { products, total, clearCart, removeFromCart, calculateTotals } = useProductStore();
+  const { products, clearCart, removeFromCart } = useProductStore();
   const router = useRouter();
 
-  // دالة حساب الخصم
+  // دالة حساب المجموع الفرعي
+  const calculateSubtotal = () => {
+    return products.reduce((sum, product) => {
+      const currentPrice = product?.price || 0;
+      const quantity = product?.amount || 1;
+      return sum + currentPrice * quantity;
+    }, 0);
+  };
+
+  // دالة حساب الخصم (للعرض فقط)
   const calculateDiscount = () => {
     return products.reduce((sum, product) => {
       const oldPrice = product?.oldPrice || 0;
       const currentPrice = product?.price || 0;
       const quantity = product?.amount || 1;
-      return sum + ((oldPrice - currentPrice) * quantity);
+      return sum + Math.max(oldPrice - currentPrice, 0) * quantity;
     }, 0);
   };
 
   // دالة حساب أعلى تكلفة شحن
   const calculateMaxShipping = () => {
     const shippingCosts = products
-      .map(p => p?.shippingCost || 0)
-      .filter(cost => cost > 0);
-    
+      .map((p) => p?.shippingCost || 0)
+      .filter((cost) => cost > 0);
+
     return shippingCosts.length > 0 ? Math.max(...shippingCosts) : 0;
   };
 
   // دالة حساب المجموع النهائي
   const calculateFinalTotal = () => {
-    const discount = calculateDiscount();
+    const subtotal = calculateSubtotal();
     const maxShipping = calculateMaxShipping();
-    return total - discount + maxShipping;
+    const finalTotal = subtotal + maxShipping;
+    return Number.isFinite(finalTotal) && finalTotal > 0 ? finalTotal : 0;
   };
 
   // دالة حذف منتج من السلة
   const handleRemoveProduct = (productId: string) => {
     removeFromCart(productId);
-    calculateTotals();
     toast.success("تم حذف المنتج من السلة");
+  };
+
+  const getProductImage = (imagePath?: string) => {
+    if (!imagePath) {
+      return "/product_placeholder.jpg";
+    }
+
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
+
+    return `/uploads/${imagePath.replace(/^\/+/, "")}`;
   };
 
   // --- Validation ---
@@ -89,7 +110,7 @@ const CheckoutPage = () => {
     try {
       const response = await apiClient.post("/api/order-product", {
         customerOrderId: orderId,
-        productId: productId,
+        productId,
         quantity: productQuantity,
       });
 
@@ -109,7 +130,7 @@ const CheckoutPage = () => {
   const makePurchase = async () => {
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
-      validationErrors.forEach(error => toast.error(error));
+      validationErrors.forEach((error) => toast.error(error));
       return;
     }
 
@@ -118,16 +139,16 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (total <= 0) {
-      toast.error("إجمالي الطلب غير صحيح");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
       const finalTotal = calculateFinalTotal();
-      
+      if (finalTotal <= 0) {
+        toast.error("إجمالي الطلب غير صحيح");
+        setIsSubmitting(false);
+        return;
+      }
+
       const orderData = {
         name: checkoutForm.name.trim(),
         phone: checkoutForm.phone.trim(),
@@ -135,7 +156,7 @@ const CheckoutPage = () => {
         adress: checkoutForm.adress.trim(),
         city: checkoutForm.city.trim(),
         orderNotice: checkoutForm.orderNotice.trim(),
-        paymentMethod: paymentMethod,
+        paymentMethod,
         status: "pending",
         total: finalTotal,
       };
@@ -371,8 +392,8 @@ const CheckoutPage = () => {
               {products.map((product) => (
                 <li key={product?.id} className="flex gap-4 relative group">
                   <Image
-                    src={product?.mainImage || "/product_placeholder.jpg"}
-                    alt={product?.title}
+                    src={getProductImage(product?.mainImage)}
+                    alt={product?.title || "صورة المنتج"}
                     width={70}
                     height={70}
                     className="h-16 w-16 rounded-lg object-cover"
@@ -381,8 +402,17 @@ const CheckoutPage = () => {
                     <h3 className="font-medium text-gray-800">{product?.title}</h3>
                     <p className="text-sm text-gray-600">الكمية: {product?.amount}</p>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <p className="font-bold text-gray-900">${product?.price}</p>
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end">
+                      <p className="font-bold text-gray-900 text-lg">
+                        ${Number(product?.price || 0).toFixed(2)}
+                      </p>
+                      {product?.oldPrice && product.oldPrice > product.price && (
+                        <span className="text-xs text-gray-400 line-through">
+                          ${Number(product.oldPrice).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                     <button
                       onClick={() => handleRemoveProduct(product?.id)}
                       disabled={isSubmitting}
@@ -395,21 +425,19 @@ const CheckoutPage = () => {
                 </li>
               ))}
             </ul>
+
+            {calculateDiscount() > 0 && (
+              <div className="mt-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+                تم توفير ${calculateDiscount().toFixed(2)}
+              </div>
+            )}
+
             <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
               <div className="flex justify-between text-gray-600">
                 <span>المجموع الفرعي</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
-              
-              {/* Discount Display */}
-              {calculateDiscount() > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>الخصم</span>
-                  <span>-${calculateDiscount().toFixed(2)}</span>
-                </div>
-              )}
-              
-              {/* Shipping/Delivery Display */}
+
               <div className="flex justify-between text-gray-600">
                 <span>التوصيل</span>
                 {calculateMaxShipping() > 0 ? (
@@ -418,8 +446,7 @@ const CheckoutPage = () => {
                   <span className="text-green-600 font-semibold">مجاني</span>
                 )}
               </div>
-              
-              {/* Final Total */}
+
               <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
                 <span>الإجمالي</span>
                 <span>${calculateFinalTotal().toFixed(2)}</span>

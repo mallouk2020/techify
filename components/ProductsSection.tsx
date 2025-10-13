@@ -1,15 +1,4 @@
-// *********************
-// Role of the component: products section intended to be on the home page
-// Name of the component: ProductsSection.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <ProductsSection slug={slug} />
-// Input parameters: no input parameters
-// Output: products grid
-// *********************
-
 "use client";
-
 import React, { useEffect, useState } from "react";
 import ProductItem from "./ProductItem";
 import Heading from "./Heading";
@@ -24,14 +13,14 @@ const ProductsSection = () => {
     const fetchProducts = async () => {
       try {
         const data = await apiClient.get("/api/products");
-        
+
         if (!data.ok) {
           console.error("Failed to fetch products:", data.status);
           setError(true);
           setLoading(false);
           return;
         }
-        
+
         const productsData = await data.json();
         setProducts(productsData);
         setLoading(false);
@@ -47,11 +36,16 @@ const ProductsSection = () => {
 
   if (loading) {
     return (
-      <div className="bg-gray-100 border-t border-gray-200">
-        <div className="mx-auto max-w-screen-2xl py-16">
+      <div className="w-full bg-white">
+        <div className="mx-auto max-w-screen-2xl py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
           <Heading title="FEATURED PRODUCTS" />
-          <div className="py-10 text-center text-slate-600">
-            <p>Loading products...</p>
+          <div className="py-12 sm:py-16 text-center">
+            <div className="flex justify-center items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+            </div>
+            <p className="text-slate-600 text-sm sm:text-base mt-4">Loading amazing products...</p>
           </div>
         </div>
       </div>
@@ -60,11 +54,17 @@ const ProductsSection = () => {
 
   if (error || products.length === 0) {
     return (
-      <div className="bg-gray-100 border-t border-gray-200">
-        <div className="mx-auto max-w-screen-2xl py-16">
+      <div className="w-full bg-white">
+        <div className="mx-auto max-w-screen-2xl py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
           <Heading title="FEATURED PRODUCTS" />
-          <div className="py-10 text-center text-slate-600">
-            <p>Products will be available soon. Please check back later.</p>
+          <div className="py-12 sm:py-16 text-center">
+            <div className="inline-flex flex-col items-center gap-3 p-6 sm:p-8 bg-slate-50 rounded-xl border border-slate-200">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <p className="text-slate-600 font-medium">Products will be available soon</p>
+              <p className="text-slate-500 text-sm">Please check back later for new items</p>
+            </div>
           </div>
         </div>
       </div>
@@ -72,13 +72,31 @@ const ProductsSection = () => {
   }
 
   return (
-    <div className="bg-gray-100 border-t border-gray-200">
-      <div className="max-w-screen-2xl mx-auto pt-20 pb-10">
-        <Heading title="FEATURED PRODUCTS" />
-        <div className="grid grid-cols-2 gap-1.5 max-[420px]:gap-1 sm:gap-2 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 max-w-screen-2xl mx-auto py-10 px-10">
+    <div className="w-full bg-gradient-to-b from-white to-slate-50">
+      <div className="max-w-screen-2xl mx-auto pt-12 sm:pt-16 lg:pt-20 pb-10 sm:pb-14 lg:pb-16 px-4 sm:px-6">
+        
+        {/* Header Section */}
+        <div className="mb-8 sm:mb-12">
+          <Heading title="FEATURED PRODUCTS" />
+          <p className="text-center text-slate-600 text-sm sm:text-base mt-4 max-w-2xl mx-auto">
+            Explore our carefully curated selection of premium products designed for modern living
+          </p>
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4 py-8 sm:py-12">
           {products.map((product: Product) => (
-            <ProductItem key={product.id} product={product} color="black" />
+            <div key={product.id} className="h-full">
+              <ProductItem product={product} color="black" />
+            </div>
           ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="flex justify-center pt-8 sm:pt-12">
+          <button className="px-6 sm:px-8 py-2.5 sm:py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-all duration-300 text-sm sm:text-base shadow-md hover:shadow-lg">
+            View All Products
+          </button>
         </div>
       </div>
     </div>

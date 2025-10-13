@@ -76,7 +76,38 @@ const ProductTabs = ({ product }: { product: Product }) => {
                 {/* row 3 */}
                 <tr className="border-b border-gray-200 hover:bg-gray-50">
                   <th className="py-4 px-6 font-semibold text-gray-700 w-1/3">Color:</th>
-                  <td className="py-4 px-6 text-gray-600">Silver, LightSlateGray, Blue</td>
+                  <td className="py-4 px-6 text-gray-600">
+                    {(() => {
+                      const colorsValue = product?.colors;
+                      if (!colorsValue) return "لا توجد معلومات";
+
+                      try {
+                        const parsed = typeof colorsValue === "string" ? JSON.parse(colorsValue) : colorsValue;
+                        const colorsArray = Array.isArray(parsed)
+                          ? parsed
+                          : typeof parsed === "string"
+                          ? parsed.split(",")
+                          : Object.values(parsed);
+
+                        const normalizedColors = colorsArray
+                          .map((color) => `${color}`.trim())
+                          .filter((color) => color.length > 0);
+
+                        if (normalizedColors.length === 0) return "لا توجد معلومات";
+
+                        return normalizedColors.join(", ");
+                      } catch (error) {
+                        const fallbackColors = `${colorsValue}`
+                          .split(",")
+                          .map((color) => color.trim())
+                          .filter((color) => color.length > 0);
+
+                        return fallbackColors.length > 0
+                          ? fallbackColors.join(", ")
+                          : "لا توجد معلومات";
+                      }
+                    })()}
+                  </td>
                 </tr>
               </tbody>
             </table>

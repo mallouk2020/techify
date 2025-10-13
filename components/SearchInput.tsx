@@ -27,16 +27,16 @@ const SearchInput = () => {
   };
 
   return (
-    <form className="flex w-full justify-center" onSubmit={searchProducts}>
+    <form className="flex w-full justify-center rounded-full overflow-hidden shadow-sm border border-slate-200 bg-white/90 min-h-[38px]" onSubmit={searchProducts}>
       <input
         type="text"
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        placeholder="Type here"
-        className="bg-gray-50 input input-bordered w-[70%] rounded-r-none outline-none focus:outline-none max-sm:w-full"
+        placeholder="ابحث عن المنتجات"
+        className="bg-transparent px-3 py-1.5 w-full text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none"
       />
-      <button type="submit" className="btn bg-blue-500 text-white rounded-l-none rounded-r-xl hover:bg-blue-600">
-        Search
+      <button type="submit" className="px-4 py-1.5 bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors">
+        بحث
       </button>
     </form>
   );

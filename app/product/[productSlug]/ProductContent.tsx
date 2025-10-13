@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { useProductStore } from "@/app/_zustand/store";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { 
-  Share2, 
-  ShoppingCart, 
-  Check, 
-  Truck, 
-  Shield, 
-  RefreshCw 
-} from 'lucide-react';
+import {
+  Share2,
+  ShoppingCart,
+  Check,
+  Truck,
+  Shield,
+  RefreshCw,
+  Clock
+} from "lucide-react";
 import {
   SingleProductRating,
   ProductTabs,
@@ -42,9 +43,43 @@ export default function ProductContent({ product, images, slug }: ProductContent
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   
+  const parseAttributeValues = (value: unknown): string[] => {
+    if (!value) return [];
+
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => `${item}`.trim())
+        .filter((attr) => attr.length > 0);
+    }
+
+    if (typeof value === "string") {
+      const trimmedValue = value.trim();
+
+      if (trimmedValue.startsWith("[") || trimmedValue.startsWith("{")) {
+        try {
+          const parsed = JSON.parse(trimmedValue);
+          if (Array.isArray(parsed)) {
+            return parsed
+              .map((item) => `${item}`.trim())
+              .filter((attr) => attr.length > 0);
+          }
+        } catch (error) {
+          // JSON parsing failed, fallback to comma-separated parsing
+        }
+      }
+
+      return trimmedValue
+        .split(",")
+        .map((item) => item.trim())
+        .filter((attr) => attr.length > 0);
+    }
+
+    return [];
+  };
+
   // تحويل الألوان والأحجام من نص إلى مصفوفة
-  const colors = product?.colors ? product.colors.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
-  const sizes = product?.sizes ? product.sizes.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+  const colors = parseAttributeValues(product?.colors);
+  const sizes = parseAttributeValues(product?.sizes);
 
   useEffect(() => {
     setSelectedImage(mainImage);
@@ -60,7 +95,9 @@ export default function ProductContent({ product, images, slug }: ProductContent
       title: product?.title,
       price: product?.price,
       amount: quantity,
-      mainImage: product?.mainImage
+      mainImage: product?.mainImage,
+      shippingCost: product?.shippingCost,
+      oldPrice: product?.oldPrice
     });
     calculateTotals();
     toast.success("تم إضافة المنتج إلى السلة");
@@ -74,6 +111,8 @@ export default function ProductContent({ product, images, slug }: ProductContent
       price: product?.price,
       mainImage: product?.mainImage || "/placeholder.jpg",
       amount: quantity,
+      shippingCost: product?.shippingCost,
+      oldPrice: product?.oldPrice
     });
     calculateTotals();
     toast.success("تم إضافة المنتج إلى السلة");
@@ -272,21 +311,35 @@ export default function ProductContent({ product, images, slug }: ProductContent
             </div>
 
             {/* مميزات إضافية (شحن، ضمان، إرجاع) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-3">
                   <Truck className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1 text-sm">شحن مجاني</h3>
-                <p className="text-xs text-slate-500">للطلبات فوق $50</p>
+                <h3 className="font-bold text-slate-900 mb-1 text-sm">الشحن</h3>
+                <p className="text-xs text-slate-500">
+                  {product?.shippingCost && product.shippingCost > 0
+                    ? `تكلفة التوصيل: $${product.shippingCost}`
+                    : "مجاني إلى جميع مدن المغرب"}
+                </p>
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-3">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1 text-sm">مدة التوصيل</h3>
+                <p className="text-xs text-slate-500">من 24 إلى 48 ساعة</p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teال-600 rounded-xl flex items-center justify-center mb-3">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1 text-sm">ضمان سنتين</h3>
-                <p className="text-xs text-slate-500">حماية كاملة</p>
+                <h3 className="font-bold text-slate-900 mb-1 text-sm">ضمان الجودة</h3>
+                <p className="text-xs text-slate-500">
+                  حماية مضمونة على جميع المنتجات. نلتزم بتبديل أو إصلاح أي منتج معيب.
+                </p>
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
@@ -294,7 +347,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
                   <RefreshCw className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">إرجاع سهل</h3>
-                <p className="text-xs text-slate-500">خلال 30 يوم</p>
+                <p className="text-xs text-slate-500">استرجاع خلال 10 أيام بخطوات بسيطة وسريعة دون أي تعقيدات.</p>
               </div>
             </div>
           </div>

@@ -13,10 +13,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 import toast from "react-hot-toast";
-import { FaHeadphones } from "react-icons/fa6";
-import { FaRegEnvelope } from "react-icons/fa6";
-import { FaLocationDot } from "react-icons/fa6";
-import { FaRegUser } from "react-icons/fa6";
+import { FaHeadphones, FaRegUser, FaCircleUser, FaArrowRightFromBracket } from "react-icons/fa6";
 
 const HeaderTop = () => {
   const { data: session }: any = useSession();
@@ -25,44 +22,66 @@ const HeaderTop = () => {
     setTimeout(() => signOut(), 1000);
     toast.success("Logout successful!");
   }
+
   return (
-    <div className="h-10 text-white bg-blue-500 max-lg:px-5 max-lg:h-16 max-[573px]:px-0">
-      <div className="flex justify-between h-full max-lg:flex-col max-lg:justify-center max-lg:items-center max-w-screen-2xl mx-auto px-12 max-[573px]:px-0">
-        <ul className="flex items-center h-full gap-x-5 max-[370px]:text-sm max-[370px]:gap-x-2">
-          <li className="flex items-center gap-x-2 font-semibold">
-            <FaHeadphones className="text-white" />
+    <div className="h-auto bg-slate-900/95 backdrop-blur text-white shadow-lg sticky top-0 z-50">
+      <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-y-2 gap-x-4 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-1">
+        
+        {/* Contact Info */}
+        <ul className="flex items-center gap-2 sm:gap-3 lg:gap-4 text-[10px] sm:text-xs lg:text-sm font-medium">
+          <li className="flex items-center gap-1.5 hover:text-blue-400 transition-colors">
+            <FaHeadphones className="text-blue-400 flex-shrink-0 text-base sm:text-lg" />
             <span>+381 61 123 321</span>
           </li>
-          <li className="flex items-center gap-x-2 font-semibold">
-            <FaRegEnvelope className="text-white text-xl" />
-            <span>test@email.com</span>
+          <li className="flex items-center gap-1.5 text-gray-200/90">
+            <span className="hidden xs:inline">support@techify.com</span>
+            <span className="xs:hidden inline">support@site.com</span>
           </li>
-        </ul>
-        <ul className="flex items-center gap-x-5 h-full max-[370px]:text-sm max-[370px]:gap-x-2 font-semibold">
-          {!session ? ( 
-          <>
-          <li className="flex items-center">
-            <Link href="/login" className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Login</span>
-            </Link>
-          </li>
-          <li className="flex items-center">
-            <Link href="/register" className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Register</span>
-            </Link>
-          </li>
-          </>
-          ) :  (<>
-          <span className="ml-10 text-base">{session.user?.email}</span>
-          <li className="flex items-center">
-            <button onClick={() => handleLogout()} className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Log out</span>
+          <li className="flex items-center gap-1.5 hover:text-blue-400 transition-colors">
+            <button
+              type="button"
+              className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-800/60 text-blue-300 hover:text-blue-200 transition"
+              aria-label={session?.user?.email ? session.user.email : "حسابي"}
+            >
+              <FaCircleUser className="text-sm sm:text-base" />
             </button>
           </li>
-          </>)}
+        </ul>
+
+        {/* Auth Links */}
+        <ul className="flex items-center gap-2 sm:gap-3 lg:gap-4 font-semibold text-[10px] sm:text-xs lg:text-sm ml-auto">
+          {!session ? (
+            <>
+              <li>
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1.5 hover:text-blue-400 transition-colors group"
+                >
+                  <FaRegUser className="text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0 text-sm sm:text-base" />
+                  <span className="hidden sm:inline">Login</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/register"
+                  className="flex items-center gap-1.5 px-2 py-1 bg-blue-500 hover:bg-blue-600 rounded-md transition-all transform hover:scale-105"
+                >
+                  <FaRegUser className="flex-shrink-0 text-sm sm:text-base" />
+                  <span className="hidden sm:inline">Register</span>
+                </Link>
+              </li>
+            </>
+          ) : (
+            <li>
+              <button
+                onClick={() => handleLogout()}
+                className="flex items-center gap-1.5 px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-white rounded-md transition-all"
+              >
+                <FaArrowRightFromBracket className="flex-shrink-0 text-sm sm:text-base" />
+                <span className="hidden sm:inline">تسجيل الخروج</span>
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </div>

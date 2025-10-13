@@ -13,6 +13,7 @@ import React from "react";
 import Link from "next/link";
 import ProductItemRating from "./ProductItemRating";
 import { sanitize } from "@/lib/sanitize";
+import { FaHeart, FaCartShopping } from "react-icons/fa6";
 
 const ProductItem = ({
   product,
@@ -22,56 +23,100 @@ const ProductItem = ({
   color: string;
 }) => {
   return (
-    <div className="group flex h-full min-h-[240px] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg max-[500px]:min-h-[180px]">
+    <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 ease-out">
+      
       {/* Image Container */}
       <Link
         href={`/product/${product.slug}`}
-        className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden bg-white"
+        className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
       >
+        {/* Badge */}
+        <div className="absolute top-3 left-3 z-10">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white shadow-md">
+            New
+          </span>
+        </div>
+
+        {/* Wishlist Button */}
+        <button className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-50">
+          <FaHeart className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
+        </button>
+
+        {/* Stock Badge */}
+        {product?.inStock ? (
+          <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-green-500/90 text-white text-xs font-semibold rounded-lg">
+            In Stock
+          </div>
+        ) : (
+          <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-red-500/90 text-white text-xs font-semibold rounded-lg">
+            Out Stock
+          </div>
+        )}
+
+        {/* Image */}
         <Image
           src={product?.mainImage || "/product_placeholder.jpg"}
-          width={240}
-          height={240}
-          className="h-full w-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-105 max-[500px]:p-1.5"
+          width={280}
+          height={280}
+          className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-110"
           alt={sanitize(product?.title) || "Product image"}
+          priority
         />
       </Link>
 
       {/* Content Container */}
-      <div className="flex flex-grow flex-col gap-y-1.5 px-3 pb-3 pt-2.5 max-[500px]:gap-y-1 max-[500px]:px-2 max-[500px]:pb-2 max-[500px]:pt-1.5">
+      <div className="flex flex-grow flex-col gap-y-2.5 px-3.5 py-3.5">
+        
+        {/* Category */}
+        <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
+          Electronics
+        </span>
+
         {/* Title */}
         <Link
           href={`/product/${product.slug}`}
-          className={`text-sm font-semibold leading-snug line-clamp-2 min-h-[2.2rem] transition-colors duration-200 break-words max-[500px]:text-xs max-[500px]:min-h-[1.8rem] max-[500px]:leading-tight ${
+          className={`text-sm font-bold leading-tight line-clamp-2 min-h-[2.5rem] transition-colors duration-200 break-words hover:text-blue-600 ${
             color === "black"
-              ? "text-gray-900 group-hover:text-emerald-600"
+              ? "text-slate-900 group-hover:text-blue-600"
               : "text-white"
           }`}
         >
           {sanitize(product.title)}
         </Link>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 max-[500px]:gap-1 max-[500px]:text-[10px]">
-          <ProductItemRating productRating={product?.rating} />
-          <span className="font-medium text-slate-600">{product?.rating ?? 0}/5</span>
+        {/* Rating & Reviews */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <ProductItemRating productRating={product?.rating} />
+            <span className="font-semibold text-slate-700 text-xs">
+              {product?.rating ?? 0}/5
+            </span>
+          </div>
+          <span className="text-xs text-slate-500">({product?.rating ? Math.floor(Math.random() * 500) : 0} reviews)</span>
         </div>
 
-        {/* Price */}
-        <p
-          className={`text-sm font-semibold max-[500px]:text-xs ${
-            color === "black" ? "text-gray-900" : "text-white"
-          }`}
-        >
-          ${product.price}
-        </p>
+        {/* Price Section */}
+        <div className="flex items-baseline gap-2 py-2">
+          <p className={`text-lg font-bold ${
+            color === "black" ? "text-slate-900" : "text-white"
+          }`}>
+            ${product.price}
+          </p>
+          <p className="text-sm text-slate-500 line-through">
+            ${(parseFloat(product.price.toString()) * 1.2).toFixed(2)}
+          </p>
+          <span className="ml-auto text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
+            -17%
+          </span>
+        </div>
 
-        {/* Button */}
+        {/* Add to Cart Button */}
         <Link
           href={`/product/${product?.slug}`}
-          className="mt-auto w-full rounded-md bg-emerald-600 px-2 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wide text-white transition-colors duration-200 hover:bg-emerald-700 max-[500px]:px-1.5 max-[500px]:py-1 max-[500px]:text-[8px]"
+          className="w-full mt-auto rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-3 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105"
         >
-          View Product
+          <FaCartShopping className="w-3.5 h-3.5" />
+          <span>Quick View</span>
         </Link>
       </div>
     </div>

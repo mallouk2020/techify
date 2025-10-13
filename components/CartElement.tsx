@@ -18,13 +18,17 @@ const CartElement = () => {
     const { allQuantity } = useProductStore();
   return (
     <div className="relative">
-            <Link href="/cart">
-              <FaCartShopping className="text-2xl text-black" />
-              <span className="block w-6 h-6 bg-blue-600 text-white rounded-full flex justify-center items-center absolute top-[-17px] right-[-22px]">
-                { allQuantity }
-              </span>
-            </Link>
-          </div>
+      <Link
+        href="/cart"
+        className="group flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 backdrop-blur transition-all duration-200 hover:bg-white/20 hover:border-white/40"
+        aria-label="Cart"
+      >
+        <FaCartShopping className="text-sm text-white drop-shadow-[0_4px_12px_rgba(59,130,246,0.55)] transition-colors group-hover:text-blue-200" />
+        <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-[8.5px] font-semibold text-white shadow-lg">
+          { allQuantity }
+        </span>
+      </Link>
+    </div>
   )
 }
 
