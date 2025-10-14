@@ -343,12 +343,12 @@ const DashboardProductDetails = ({
           </label>
         </div>
         {/* Product slug input div - end */}
-        {/* Product inStock select input div - start */}
+        {/* Product inStock select input div - start - Three States */}
 
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
-              <span className="label-text">Is product in stock?</span>
+              <span className="label-text">Product availability status:</span>
             </div>
             <select
               className="select select-bordered"
@@ -357,8 +357,9 @@ const DashboardProductDetails = ({
                 setProduct({ ...product!, inStock: Number(e.target.value) });
               }}
             >
-              <option value={1}>Yes</option>
-              <option value={0}>No</option>
+              <option value={1}>In Stock (متوفر)</option>
+              <option value={2}>Available on Order (يمكن توفيره)</option>
+              <option value={0}>Out of Stock (غير متوفر)</option>
             </select>
           </label>
         </div>

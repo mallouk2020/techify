@@ -56,6 +56,20 @@ async function runMigration() {
               ALTER TABLE "Product" ADD COLUMN "shippingCost" INTEGER;
               RAISE NOTICE 'Added shippingCost column';
           END IF;
+
+          -- Add selectedColor column to customer_order_product
+          IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                         WHERE table_name='customer_order_product' AND column_name='selectedColor') THEN
+              ALTER TABLE "customer_order_product" ADD COLUMN "selectedColor" TEXT;
+              RAISE NOTICE 'Added selectedColor column to customer_order_product';
+          END IF;
+
+          -- Add selectedSize column to customer_order_product
+          IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                         WHERE table_name='customer_order_product' AND column_name='selectedSize') THEN
+              ALTER TABLE "customer_order_product" ADD COLUMN "selectedSize" TEXT;
+              RAISE NOTICE 'Added selectedSize column to customer_order_product';
+          END IF;
       END $$;
     `;
     

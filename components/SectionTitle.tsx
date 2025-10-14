@@ -14,12 +14,6 @@ const SectionTitle = ({ title, path }: { title: string; path: string }) => {
   return (
     <div className='w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden'>
       <div className='max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16'>
-        {/* Decorative background elements */}
-        <div className='absolute inset-0 overflow-hidden pointer-events-none'>
-          <div className='absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl'></div>
-          <div className='absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl'></div>
-        </div>
-
         {/* Content */}
         <div className='relative z-10 space-y-6 sm:space-y-8'>
           {/* Breadcrumb / Path */}

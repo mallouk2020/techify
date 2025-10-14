@@ -105,13 +105,17 @@ const CheckoutPage = () => {
   const addOrderProduct = async (
     orderId: string,
     productId: string,
-    productQuantity: number
+    productQuantity: number,
+    selectedColor?: string,
+    selectedSize?: string
   ) => {
     try {
       const response = await apiClient.post("/api/order-product", {
         customerOrderId: orderId,
         productId,
         quantity: productQuantity,
+        selectedColor: selectedColor || null,
+        selectedSize: selectedSize || null,
       });
 
       if (!response.ok) {
@@ -187,7 +191,13 @@ const CheckoutPage = () => {
 
       // Add each product to the order
       for (const product of products) {
-        await addOrderProduct(orderId, product.id, product.amount);
+        await addOrderProduct(
+          orderId, 
+          product.id, 
+          product.amount,
+          product.selectedColor,
+          product.selectedSize
+        );
       }
 
       // Reset form and cart

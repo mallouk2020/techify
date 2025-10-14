@@ -35,7 +35,7 @@ interface ProductContentProps {
 
 export default function ProductContent({ product, images, slug }: ProductContentProps) {
   const router = useRouter();
-  const { addToCart, calculateTotals } = useProductStore();
+  const { addToCart, calculateTotals, products } = useProductStore();
   
   const mainImage = product?.mainImage || "/product_placeholder.jpg";
   const [selectedImage, setSelectedImage] = useState(mainImage);
@@ -97,26 +97,40 @@ export default function ProductContent({ product, images, slug }: ProductContent
       amount: quantity,
       mainImage: product?.mainImage,
       shippingCost: product?.shippingCost,
-      oldPrice: product?.oldPrice
+      oldPrice: product?.oldPrice,
+      selectedColor: selectedColor || undefined,
+      selectedSize: selectedSize || undefined
     });
     calculateTotals();
     toast.success("تم إضافة المنتج إلى السلة");
   };
 
-  // دالة الشراء الآن
+  // دالة الشراء الآن - Smart Logic
   const handleBuyNow = () => {
-    addToCart({
-      id: product?.id.toString(),
-      title: product?.title,
-      price: product?.price,
-      mainImage: product?.mainImage || "/placeholder.jpg",
-      amount: quantity,
-      shippingCost: product?.shippingCost,
-      oldPrice: product?.oldPrice
-    });
-    calculateTotals();
-    toast.success("تم إضافة المنتج إلى السلة");
-    router.push("/checkout");
+    // التحقق إذا المنتج موجود في السلة
+    const existingProduct = products.find(p => p.id === product?.id.toString());
+    
+    if (existingProduct) {
+      // المنتج موجود → انتقل مباشرة للدفع
+      toast.success("المنتج موجود في السلة، جاري الانتقال للدفع");
+      router.push("/checkout");
+    } else {
+      // المنتج غير موجود → أضفه ثم انتقل للدفع
+      addToCart({
+        id: product?.id.toString(),
+        title: product?.title,
+        price: product?.price,
+        mainImage: product?.mainImage || "/placeholder.jpg",
+        amount: quantity,
+        shippingCost: product?.shippingCost,
+        oldPrice: product?.oldPrice,
+        selectedColor: selectedColor || undefined,
+        selectedSize: selectedSize || undefined
+      });
+      calculateTotals();
+      toast.success("تم إضافة المنتج للسلة");
+      setTimeout(() => router.push("/checkout"), 500);
+    }
   };
 
   return (
@@ -143,11 +157,21 @@ export default function ProductContent({ product, images, slug }: ProductContent
                 <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
               </button>
 
-              {/* شارة التوفر */}
-              {product?.inStock && (
+              {/* شارة التوفر - Three States */}
+              {product?.inStock === 1 ? (
                 <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
                   <Check className="w-4 h-4" />
-                  متوفر في المخزون
+                  متوفر
+                </div>
+              ) : product?.inStock === 2 ? (
+                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-orange-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
+                  <Clock className="w-4 h-4" />
+                  يمكن توفيره
+                </div>
+              ) : (
+                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-red-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
+                  <RefreshCw className="w-4 h-4" />
+                  غير متوفر
                 </div>
               )}
             </div>
@@ -181,7 +205,10 @@ export default function ProductContent({ product, images, slug }: ProductContent
           {/* قسم المعلومات */}
           <div className="space-y-4 sm:space-y-5">
             <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-xl border border-slate-200">
-              <SingleProductRating rating={product?.rating} />
+              <SingleProductRating
+                rating={product?.rating}
+                ratingCount={product?.ratingCount}
+              />
 
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-4 leading-tight">
                 {sanitize(product?.title)}
@@ -277,7 +304,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
                 <div className="space-y-3">
                   <button 
                     onClick={handleAddToCart}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-xl shadow-blue-500/30 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
                     <span className="text-base sm:text-lg">أضف إلى السلة</span>
@@ -285,7 +312,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
 
                   <button 
                     onClick={handleBuyNow}
-                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-xl shadow-emerald-500/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <span className="text-base sm:text-lg">اشترِ الآن</span>
                   </button>
@@ -298,7 +325,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
 
               {/* رمز المنتج والمفضلة */}
               <div className="mt-5 pt-5 border-t border-slate-100 space-y-3">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-[10px]">
                   <span className="text-slate-600">رمز المنتج (SKU):</span>
                   <span className="font-mono font-semibold text-slate-900">{product?.sku || product?.id}</span>
                 </div>

@@ -10,7 +10,7 @@ interface Product {
   mainImage: string;
   manufacturer: string;
   categoryId: string;
-  category: {name: string}?;
+  category?: {name: string};
   inStock: number;
   stock?: number;
   colors?: string;

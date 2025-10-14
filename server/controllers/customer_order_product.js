@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 const { asyncHandler, AppError } = require("../utills/errorHandler");
 
 const createOrderProduct = asyncHandler(async (request, response) => {
-  const { customerOrderId, productId, quantity } = request.body;
+  const { customerOrderId, productId, quantity, selectedColor, selectedSize } = request.body;
   
   // Validate required fields
   if (!customerOrderId) {
@@ -39,7 +39,9 @@ const createOrderProduct = asyncHandler(async (request, response) => {
     data: {
       customerOrderId: customerOrderId,
       productId: productId,
-      quantity: parseInt(quantity)
+      quantity: parseInt(quantity),
+      selectedColor: selectedColor || null,
+      selectedSize: selectedSize || null
     }
   });
 

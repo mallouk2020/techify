@@ -15,7 +15,7 @@ const Hero = () => {
   return (
     <div className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
       <div className="border-t border-b  border-blue-500/40 overflow-hidden">
-        <div className="grid grid-cols-1  shadow-blue-500/30 lg:grid-cols-2 items-center justify-items-center px-4 sm:px-6 lg:px-8 gap-4 sm:gap-6 lg:gap-12 max-w-screen-2xl mx-auto min-h-[240px] sm:min-h-[320px] lg:min-h-[400px] py-4 sm:py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center justify-items-center px-4 sm:px-6 lg:px-8 gap-4 sm:gap-6 lg:gap-12 max-w-screen-2xl mx-auto min-h-[240px] sm:min-h-[320px] lg:min-h-[400px] py-4 sm:py-8 lg:py-12">
           
           {/* Text Content */}
           <div className="flex flex-col gap-y-3 sm:gap-y-4 w-full order-2 lg:order-1 justify-center">

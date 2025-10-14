@@ -123,8 +123,9 @@ const paymentValidation = {
       throw new ValidationError('Cardholder name must be less than 50 characters', 'cardholderName');
     }
 
-    // Allow letters, spaces, hyphens, and apostrophes
-    if (!/^[a-zA-Z\s\-']+$/.test(trimmedName)) {
+    // Allow letters (including Arabic), spaces, hyphens, and apostrophes
+    // Arabic Unicode range: \u0600-\u06FF
+    if (!/^[a-zA-Z\u0600-\u06FF\s\-']+$/.test(trimmedName)) {
       throw new ValidationError('Cardholder name contains invalid characters', 'cardholderName');
     }
 
@@ -183,8 +184,9 @@ const orderValidation = {
       throw new ValidationError(`${fieldName} must be less than 50 characters`, fieldName);
     }
 
-    // Allow letters, spaces, hyphens, and apostrophes
-    if (!/^[a-zA-Z\s\-']+$/.test(trimmedName)) {
+    // Allow letters (including Arabic), spaces, hyphens, and apostrophes
+    // Arabic Unicode range: \u0600-\u06FF
+    if (!/^[a-zA-Z\u0600-\u06FF\s\-']+$/.test(trimmedName)) {
       throw new ValidationError(`${fieldName} contains invalid characters`, fieldName);
     }
 

@@ -1,11 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -20,20 +14,20 @@ model Product {
   title          String
   mainImage      String
   price          Int                      @default(0)
-  oldPrice       Int?                     // السعر القديم (اختياري)
   rating         Int                      @default(0)
-  ratingCount    Int?                     // عدد التقييمات
   description    String
   manufacturer   String
   inStock        Int                      @default(1)
-  stock          Int?                     // عدد القطع المتوفرة
-  colors         String?                  // الألوان المتاحة (مفصولة بفواصل)
-  sizes          String?                  // الأحجام المتاحة (مفصولة بفواصل)
-  shippingCost   Int?                     // تكلفة التوصيل (إذا كانت فارغة = مجاني)
   categoryId     String
+  colors         String?
+  oldPrice       Int?
+  sizes          String?
+  shippingCost   Int?
+  stock          Int?
+  ratingCount    Int?
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  customerOrders customer_order_product[]
   Wishlist       Wishlist[]
+  customerOrders customer_order_product[]
 }
 
 model Image {
@@ -72,23 +66,25 @@ model Customer_order {
 
 model customer_order_product {
   id              String         @id @default(uuid())
-  customerOrder   Customer_order @relation(fields: [customerOrderId], references: [id])
   customerOrderId String
-  product         Product        @relation(fields: [productId], references: [id])
   productId       String
   quantity        Int
+  selectedColor   String?
+  selectedSize    String?
+  customerOrder   Customer_order @relation(fields: [customerOrderId], references: [id])
+  product         Product        @relation(fields: [productId], references: [id])
 }
 
 model Category {
   id       String    @id @default(uuid())
   name     String    @unique
-  products Product[] // Define a one-to-many relationship
+  products Product[]
 }
 
 model Wishlist {
   id        String  @id @default(uuid())
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

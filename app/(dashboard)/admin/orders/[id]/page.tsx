@@ -14,6 +14,8 @@ interface OrderProduct {
   customerOrderId: string;
   productId: string;
   quantity: number;
+  selectedColor?: string;
+  selectedSize?: string;
   product: {
     id: string;
     slug: string;
@@ -269,6 +271,22 @@ const AdminSingleOrder = () => {
                 <p>
                   ${product?.product?.price} * {product?.quantity} items
                 </p>
+                {(product?.selectedColor || product?.selectedSize) && (
+                  <div className="flex gap-x-3 mt-1 text-sm text-gray-600">
+                    {product?.selectedColor && (
+                      <span className="flex items-center gap-x-1">
+                        <span className="font-medium">Color:</span>
+                        <span>{product.selectedColor}</span>
+                      </span>
+                    )}
+                    {product?.selectedSize && (
+                      <span className="flex items-center gap-x-1">
+                        <span className="font-medium">Size:</span>
+                        <span>{product.selectedSize}</span>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}

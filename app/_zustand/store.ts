@@ -10,6 +10,8 @@ export type ProductInCart = {
   shippingCost?: number;
   // image: string;
   amount: number;
+  selectedColor?: string;
+  selectedSize?: string;
 };
 
 export type State = {

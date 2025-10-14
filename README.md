@@ -190,14 +190,15 @@ model customer_order {
 #### 5. **customer_order_product** - عناصر الطلب
 ```prisma
 model customer_order_product {
-  id        String         @id @default(uuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Int
+  id            String         @id @default(uuid())
+  orderId       String
+  productId     String
+  quantity      Int
+  selectedColor String?        // 🆕 اللون المختار
+  selectedSize  String?        // 🆕 الحجم المختار
   
-  order     customer_order @relation(fields: [orderId], references: [id])
-  product   Product        @relation(fields: [productId], references: [id])
+  order         customer_order @relation(fields: [orderId], references: [id])
+  product       Product        @relation(fields: [productId], references: [id])
 }
 ```
 

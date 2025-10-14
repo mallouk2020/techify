@@ -29,17 +29,16 @@ const ProductItemRating = ({ productRating }: { productRating: number }) => {
     rating[i] = "full star";
   }
   return (
-    <div className="flex">
-        { rating && rating?.map(singleRating => {
-return (
-    <div  key={nanoid()}>
-    {singleRating === "full star" && <AiFillStar className="text-yellow-400 text-xl" />}
-    {singleRating === "empty star" && <AiOutlineStar className="text-yellow-400 text-xl" />}
-    </div>
-    
-)
-        }) }
-
+    <div className="flex items-center gap-0.5 text-yellow-400">
+      {rating?.map((singleRating) => (
+        <div key={nanoid()}>
+          {singleRating === "full star" ? (
+            <AiFillStar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          ) : (
+            <AiOutlineStar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };
