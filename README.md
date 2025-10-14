@@ -700,7 +700,105 @@ git commit -m "refactor: improve code structure"
 
 ---
 
-## � آخر التحديثات | Latest Updates
+## 📝 آخر التحديثات | Latest Updates
+
+### v2.2.0 - Product Card Responsive Fix + Color/Size Features (يناير 2025)
+
+#### ✨ الميزات الجديدة
+- ✅ **إصلاح Product Card Responsive** - تحسين المسافات والأبعاد للهواتف والشاشات الكبيرة
+  - Content Gap: 4px (mobile) → 10px (desktop)
+  - Padding: 12px/8px (mobile) → 16px/12px (desktop)
+  - Rating Gap: 0px (mobile) → 6px (desktop)
+- ✅ **Color & Size Selection** - إضافة اختيار اللون والحجم في صفحة المنتج
+- ✅ **Arabic Name Validation** - دعم الأسماء العربية في صفحة الدفع
+- ✅ **Order Details Enhancement** - عرض اللون والحجم المختار في تفاصيل الطلب
+
+#### 🐛 إصلاحات الأخطاء
+- ✅ **TypeScript Interface Fix** - إضافة `selectedColor` و `selectedSize` إلى `OrderProduct` interface
+- ✅ **Prisma Migration** - تحديث قاعدة البيانات بإضافة حقول `selectedColor` و `selectedSize`
+- ✅ **Arabic Regex Fix** - تحديث validation regex لقبول الأحرف العربية `[\u0600-\u06FF]`
+
+#### 🚀 مشاكل النشر والحلول | Deployment Issues & Solutions
+
+##### Issue #1: TypeScript Compilation Error
+**المشكلة**:
+```
+Property 'selectedColor' does not exist on type 'OrderProduct'
+Property 'selectedSize' does not exist on type 'OrderProduct'
+```
+
+**السبب**: تم إضافة الحقول إلى Prisma Schema لكن لم يتم تحديث TypeScript interface
+
+**الحل**:
+```typescript
+// app/(dashboard)/admin/orders/[id]/page.tsx
+interface OrderProduct {
+  // ... existing fields
+  selectedColor?: string;  // 🆕
+  selectedSize?: string;   // 🆕
+}
+```
+
+##### Issue #2: Prisma EPERM Error (Windows)
+**المشكلة**:
+```
+EPERM: operation not permitted, rename query_engine-windows.dll.node
+```
+
+**السبب**: عمليات Node.js تحتفظ بملفات Prisma Client مفتوحة على Windows
+
+**الحل**:
+```powershell
+# 1. إيقاف جميع عمليات Node.js
+Get-Process | Where-Object {$_.ProcessName -like "*node*"} | Stop-Process -Force
+
+# 2. حذف مجلد .prisma
+Remove-Item -Path "node_modules\.prisma" -Recurse -Force
+
+# 3. إعادة البناء
+npm run build
+```
+
+##### Issue #3: Products Not Showing After Deployment
+**المشكلة**: المنتجات لا تظهر في الموقع بعد النشر على Vercel
+
+**السبب**: لم يتم تشغيل migration script على قاعدة البيانات في Railway
+
+**الحل**:
+```bash
+# تشغيل migration script يدوياً
+cd server
+node migrate-railway.js
+
+# ✅ Migration completed successfully!
+# ✅ Database schema updated with new Product columns
+```
+
+**الدرس المستفاد**: 
+- ⚠️ تحديث Prisma Schema محلياً لا يعني تحديث قاعدة البيانات في Production
+- ✅ يجب تشغيل migration script بعد كل تحديث للـ Schema
+- ✅ التحقق من عمل API بعد النشر مباشرة
+
+##### Issue #4: Git Staging Failure
+**المشكلة**: `git add .` لا يضيف جميع التغييرات
+
+**الحل**: استخدام `git add -A` بدلاً من `git add .`
+
+#### 📊 Build Statistics
+- **Build Time**: ~61 seconds
+- **Total Routes**: 24 app routes
+- **Static Pages**: 18/18 generated
+- **Bundle Sizes**: All routes under 160KB first load JS
+- **Warnings**: 9 ESLint warnings (non-blocking)
+
+#### ✅ التحقق من الجودة
+- ✅ **TypeScript Clean** - لا توجد أخطاء compilation
+- ✅ **Build Successful** - البناء نجح بدون مشاكل
+- ✅ **Migration Applied** - قاعدة البيانات محدثة
+- ✅ **Deployed Successfully** - النشر نجح على Vercel و Railway
+- ✅ **Products Showing** - المنتجات تظهر بشكل صحيح
+
+---
 
 ### v2.1.1 - إصلاحات TypeScript النهائية (ديسمبر 2024)
 
@@ -845,7 +943,7 @@ MIT License - See LICENSE file for details
 ## 👨‍💻 المطور | Developer
 
 **Project**: Techify E-Commerce Platform  
-**Version**: 1.3.0 (Stable)  
+**Version**: 2.2.0 (Stable)  
 **Last Updated**: January 2025  
 **Status**: ✅ Production Ready
 
@@ -879,7 +977,7 @@ MIT License - See LICENSE file for details
 🔄 للعودة لهذه النسخة المستقرة:
 
 # إذا حدثت مشاكل في المستقبل
-git checkout v1.3.0-stable
+git checkout v2.2.0-stable
 
 # أو إنشاء branch جديد من هذه النسخة
-git checkout -b stable-backup v1.3.0-stable
+git checkout -b stable-backup v2.2.0-stable
