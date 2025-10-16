@@ -15,6 +15,7 @@ import { FaRegUser } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
 import { FaBagShopping } from "react-icons/fa6";
 import { MdCategory } from "react-icons/md";
+import { FaImage } from "react-icons/fa6";
 
 
 import Link from "next/link";
@@ -50,6 +51,12 @@ const DashboardSidebar = () => {
         <div className="flex gap-x-2 w-full hover:bg-blue-600 cursor-pointer items-center py-6 pl-5 text-xl text-white">
           <FaRegUser className="text-2xl" />{" "}
           <span className="font-normal">Users</span>
+        </div>
+      </Link>
+      <Link href="/admin/hero-settings">
+        <div className="flex gap-x-2 w-full hover:bg-blue-600 cursor-pointer items-center py-6 pl-5 text-xl text-white">
+          <FaImage className="text-2xl" />{" "}
+          <span className="font-normal">Hero Section</span>
         </div>
       </Link>
       <Link href="/admin/settings">

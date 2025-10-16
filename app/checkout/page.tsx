@@ -6,16 +6,19 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 const CheckoutPage = () => {
+  const { data: session, update: refreshSession } = useSession();
   const [checkoutForm, setCheckoutForm] = useState({
     name: "",
     phone: "",
     email: "",
     adress: "",
-    city: "",
     orderNotice: "",
   });
+  const [isDataAutoFilled, setIsDataAutoFilled] = useState(false);
+  const [saveDataToProfile, setSaveDataToProfile] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,9 +98,6 @@ const CheckoutPage = () => {
     if (!checkoutForm.adress.trim() || checkoutForm.adress.trim().length < 5) {
       errors.push("العنوان يجب أن يكون على الأقل 5 أحرف");
     }
-    if (!checkoutForm.city.trim() || checkoutForm.city.trim().length < 2) {
-      errors.push("المدينة يجب أن تكون على الأقل حرفين");
-    }
     return errors;
   };
 
@@ -158,7 +158,7 @@ const CheckoutPage = () => {
         phone: checkoutForm.phone.trim(),
         email: checkoutForm.email.trim() || "noemail@cod.order",
         adress: checkoutForm.adress.trim(),
-        city: checkoutForm.city.trim(),
+        city: "", // حقل المدينة تم إزالته من النموذج
         orderNotice: checkoutForm.orderNotice.trim(),
         paymentMethod,
         status: "pending",
@@ -200,13 +200,39 @@ const CheckoutPage = () => {
         );
       }
 
+      // Save user data to profile if checkbox is checked
+      if (session?.user && saveDataToProfile) {
+        try {
+          const updateResponse = await apiClient.put("/api/user/profile", {
+            phone: checkoutForm.phone.trim(),
+            address: checkoutForm.adress.trim(),
+          });
+
+          if (updateResponse.ok) {
+            toast.success("تم حفظ بياناتك في ملفك الشخصي");
+            if (typeof refreshSession === "function") {
+              try {
+                await refreshSession({
+                  phone: checkoutForm.phone.trim(),
+                  address: checkoutForm.adress.trim(),
+                });
+              } catch (refreshError) {
+                console.error("Failed to refresh session after profile update:", refreshError);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error saving user profile:", error);
+          // Don't show error to user as order was successful
+        }
+      }
+
       // Reset form and cart
       setCheckoutForm({
         name: "",
         phone: "",
         email: "",
         adress: "",
-        city: "",
         orderNotice: "",
       });
       clearCart();
@@ -225,12 +251,51 @@ const CheckoutPage = () => {
     }
   };
 
-  // --- Redirect if cart is empty ---
+  // --- Auto-fill user data from session ---
   useEffect(() => {
-    if (products.length === 0) {
-      toast.error("سلة التسوق فارغة");
-      router.push("/cart");
+    if (session?.user && !isDataAutoFilled) {
+      const user = session.user as any;
+      
+      console.log("🔍 Session user data:", {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address
+      });
+      
+      // تعبئة البيانات المتوفرة فقط
+      const updatedForm: any = {
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        adress: user.address || "",
+        orderNotice: "",
+      };
+      
+      // تحقق من وجود بيانات فعلية
+      const hasData = !!(user.name || user.email || user.phone || user.address);
+      
+      if (hasData) {
+        setCheckoutForm(updatedForm);
+        setIsDataAutoFilled(true);
+        toast.success("تم ملء بياناتك تلقائياً من ملفك الشخصي");
+      } else {
+        console.log("⚠️ No user data found in session. User may need to logout and login again.");
+      }
     }
+  }, [session, isDataAutoFilled]);
+
+  // --- Redirect if cart is empty (with delay to allow data loading) ---
+  useEffect(() => {
+    // انتظر قليلاً للسماح بتحميل البيانات من localStorage
+    const timer = setTimeout(() => {
+      if (products.length === 0) {
+        toast.error("سلة التسوق فارغة");
+        router.push("/cart");
+      }
+    }, 500); // انتظر 500ms قبل التحقق
+
+    return () => clearTimeout(timer);
   }, [products.length, router]);
 
   // --- JSX ---
@@ -340,26 +405,13 @@ const CheckoutPage = () => {
               <h3 className="text-lg font-bold text-gray-800">عنوان التوصيل</h3>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  العنوان *
+                  العنوان الكامل (المدينة، الحي، الشارع) *
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={3}
                   value={checkoutForm.adress}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, adress: e.target.value })}
-                  placeholder="شارع الملك فهد، حي النزهة"
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  المدينة *
-                </label>
-                <input
-                  type="text"
-                  value={checkoutForm.city}
-                  onChange={(e) => setCheckoutForm({ ...checkoutForm, city: e.target.value })}
-                  placeholder="الرياض، جدة، الدمام"
+                  placeholder="مثال: الرياض، حي النزهة، شارع الملك فهد، بجوار مركز التسوق"
                   disabled={isSubmitting}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100"
                 />
@@ -378,6 +430,29 @@ const CheckoutPage = () => {
                 />
               </div>
             </div>
+
+            {/* Save data checkbox for logged-in users */}
+            {session?.user && (
+              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={saveDataToProfile}
+                    onChange={(e) => setSaveDataToProfile(e.target.checked)}
+                    disabled={isSubmitting}
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      حفظ هذه البيانات في ملفي الشخصي
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      سيتم ملء البيانات تلقائياً في المرات القادمة
+                    </p>
+                  </div>
+                </label>
+              </div>
+            )}
 
             <button
               type="button"

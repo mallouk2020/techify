@@ -3,6 +3,7 @@ import { commonValidations } from "./validation";
 
 // Registration schema with comprehensive validation
 export const registrationSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
   email: commonValidations.email,
   password: commonValidations.password,
 });

@@ -36,12 +36,18 @@ model Image {
   image     String
 }
 
+// ✅ Updated User Model with phone, address, and name
 model User {
-  id       String     @id @default(uuid())
-  email    String     @unique
-  password String?
-  role     String?    @default("user")
-  Wishlist Wishlist[]
+  id        String     @id @default(uuid())
+  name      String?    // ✅ Added: Full name
+  email     String     @unique
+  password  String?
+  phone     String?    // ✅ Added: Phone number
+  address   String?    // ✅ Added: Full address
+  role      String?    @default("user")
+  createdAt DateTime   @default(now())  // ✅ Added: Track creation
+  updatedAt DateTime   @updatedAt       // ✅ Added: Track updates
+  Wishlist  Wishlist[]
 }
 
 model Customer_order {
@@ -87,4 +93,34 @@ model Wishlist {
   userId    String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HeroSection {
+  id              String   @id @default(uuid())
+  
+  // النصوص
+  badge           String   @default("FEATURED PRODUCT")
+  title           String
+  description     String
+  
+  // الصورة
+  imageUrl        String
+  
+  // الأزرار
+  button1Text     String   @default("BUY NOW")
+  button1Link     String
+  button2Text     String   @default("LEARN MORE")
+  button2Link     String
+  
+  // الإحصائيات
+  stat1Value      String   @default("50K+")
+  stat1Label      String   @default("Happy Customers")
+  stat2Value      String   @default("4.9")
+  stat2Label      String   @default("Rating")
+  
+  // الإعدادات
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

@@ -25,18 +25,40 @@ export const authOptions = {
         if (!user || !user.password) return null;
 
         const isCorrect = await bcrypt.compare(credentials.password, user.password);
-        return isCorrect ? { id: user.id, email: user.email, role: user.role } : null;
+        return isCorrect ? { 
+          id: user.id, 
+          email: user.email, 
+          role: user.role,
+          name: user.name,
+          phone: user.phone,
+          address: user.address,
+        } : null;
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
-      if (user) token.role = user.role;
+    async jwt({ token, user, trigger, session }: any) {
+      if (user) {
+        token.role = user.role;
+        token.name = user.name;
+        token.phone = user.phone;
+        token.address = user.address;
+      }
+
+      if (trigger === "update" && session) {
+        if (session.name !== undefined) token.name = session.name;
+        if (session.phone !== undefined) token.phone = session.phone;
+        if (session.address !== undefined) token.address = session.address;
+      }
+
       return token;
     },
     async session({ session, token }: any) {
-      if (session.user && token.role) {
+      if (session.user) {
         session.user.role = token.role as string;
+        session.user.name = token.name as string;
+        session.user.phone = token.phone as string;
+        session.user.address = token.address as string;
       }
       return session;
     },

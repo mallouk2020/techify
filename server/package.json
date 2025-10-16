@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "build": "prisma generate",
-    "postinstall": "prisma generate && node migrate-railway.js",
+    "postinstall": "prisma generate && node migrate-railway.js && node migrate-user-fields.js",
     "vercel-build": "prisma generate",
     "migrate": "node migrate-railway.js",
     "dev": "node app.js"

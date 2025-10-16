@@ -35,7 +35,7 @@ export const useWishlistStore = create<State & Actions>((set) => ({
         return { wishlist: [...state.wishlist], wishQuantity: state.wishlist.length };
       } else {
         const newWishlist = state.wishlist.filter((item) => item.id !== id);
-        return { wishlist: [...newWishlist], wishQuantity: state.wishlist.length };
+        return { wishlist: [...newWishlist], wishQuantity: newWishlist.length };
       }
     });
   },

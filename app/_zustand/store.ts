@@ -12,6 +12,7 @@ export type ProductInCart = {
   amount: number;
   selectedColor?: string;
   selectedSize?: string;
+  inStock?: number;
 };
 
 export type State = {

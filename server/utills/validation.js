@@ -345,7 +345,8 @@ const validateOrderData = (orderData) => {
   validatedData.name = safeValidate(orderValidation.validateName, orderData.name, 'name');
   validatedData.phone = safeValidate(orderValidation.validatePhone, orderData.phone, 'phone');
   validatedData.adress = safeValidate(orderValidation.validateAddress, orderData.adress, 'address');
-  validatedData.city = safeValidate(orderValidation.validateAddress, orderData.city, 'city');
+  // City is now optional (included in address field)
+  validatedData.city = orderData.city?.trim() || '';
   validatedData.total = safeValidate(orderValidation.validateTotal, orderData.total, 'total');
   validatedData.status = safeValidate(orderValidation.validateStatus, orderData.status || 'pending', 'status');
   
