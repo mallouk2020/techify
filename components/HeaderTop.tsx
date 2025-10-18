@@ -42,6 +42,15 @@ const HeaderTop = () => {
           </li>
           <li>
             <a
+              href="https://www.instagram.com/techify.maroc?igsh=MTUzcTI1cGhwMTRtbQ=="
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 hover:bg-pink-500 flex items-center justify-center transition-all group"
+              aria-label="Instagram"
+            >
+              <FaInstagram className="text-xs sm:text-sm text-slate-400 group-hover:text-white" />
+            </a>
+          </li>
+          <li>
+            <a
               href="mailto:support@techify.com"
               className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 hover:bg-red-500 flex items-center justify-center transition-all group"
               aria-label="Email"
@@ -49,15 +58,7 @@ const HeaderTop = () => {
               <FaEnvelope className="text-xs sm:text-sm text-slate-400 group-hover:text-white" />
             </a>
           </li>
-          <li>
-            <a
-              href="#"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 hover:bg-pink-500 flex items-center justify-center transition-all group"
-              aria-label="Instagram"
-            >
-              <FaInstagram className="text-xs sm:text-sm text-slate-400 group-hover:text-white" />
-            </a>
-          </li>
+          
         </ul>
 
         {/* Auth Links - Right Side */}

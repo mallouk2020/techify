@@ -112,7 +112,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
     
     if (existingProduct) {
       // المنتج موجود → انتقل مباشرة للدفع
-      toast.success("المنتج موجود في السلة، جاري الانتقال للدفع");
+      toast.success("المنتج موجود في السلة، جاري الانتقال لصفحة تاكيد الطلب");
       router.push("/checkout");
     } else {
       // المنتج غير موجود → أضفه ثم انتقل للدفع
@@ -164,9 +164,9 @@ export default function ProductContent({ product, images, slug }: ProductContent
                   متوفر
                 </div>
               ) : product?.inStock === 2 ? (
-                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-orange-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
+                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-blue-300 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
                   <Clock className="w-4 h-4" />
-                  يمكن توفيره
+                  جاهز عند اطلب
                 </div>
               ) : (
                 <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-red-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
@@ -216,12 +216,12 @@ export default function ProductContent({ product, images, slug }: ProductContent
 
               <div className="flex items-baseline gap-3 mb-5">
                 <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Dhs{product?.price}
+                  {product?.price}Dhs
                 </span>
                 {product?.oldPrice && product.oldPrice > product.price && (
                   <>
                     <span className="text-xl sm:text-2xl font-semibold text-slate-400 line-through">
-                      Dhs{product.oldPrice}
+                      {product.oldPrice}Dhs
                     </span>
                     <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                       -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
@@ -233,7 +233,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
               {/* الألوان المتاحة */}
               {colors.length > 0 && (
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">اللون</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-3">colors</label>
                   <div className="flex flex-wrap gap-2">
                     {colors.map((color: string) => (
                       <button
@@ -255,7 +255,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
               {/* الأحجام المتاحة */}
               {sizes.length > 0 && (
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">الحجم</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-3">sizes</label>
                   <div className="flex flex-wrap gap-2">
                     {sizes.map((size: string) => (
                       <button
@@ -346,7 +346,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">الشحن</h3>
                 <p className="text-xs text-slate-500">
                   {product?.shippingCost && product.shippingCost > 0
-                    ? `تكلفة التوصيل: Dhs${product.shippingCost}`
+                    ? ` ${product.shippingCost}Dhs :تكلفة التوصيل`
                     : "مجاني إلى جميع مدن المغرب"}
                 </p>
               </div>

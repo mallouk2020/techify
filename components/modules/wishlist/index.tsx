@@ -173,7 +173,7 @@ export const WishlistModule = () => {
                   {sanitize(item.title)}
                 </Link>
                 <p className="mt-1.5 text-base sm:text-lg font-bold text-blue-600">
-                  ${item.price}
+                  {item.price}Dhs
                 </p>
               </div>
 

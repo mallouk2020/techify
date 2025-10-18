@@ -30,7 +30,7 @@ const Footer = () => {
             <div className="lg:col-span-4">
               <div className="mb-3">
                 <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 text-transparent bg-clip-text">
-                  Singitronic
+                  Techify
                 </h3>
               </div>
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-3">
@@ -43,15 +43,15 @@ const Footer = () => {
                   <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors flex-shrink-0">
                     <FaPhone className="text-xs text-blue-400" />
                   </div>
-                  <span className="hidden sm:inline">+381 61 123 3211</span>
-                  <span className="sm:hidden">+381 61 123</span>
+                  <span className="hidden sm:inline">+212 61 123 3211</span>
+                  <span className="sm:hidden">+212 61 123 3211</span>
                 </a>
                 <a href="mailto:support@techify.com" className="flex items-center gap-2 text-xs sm:text-sm text-slate-300 hover:text-blue-400 transition-colors group">
                   <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors flex-shrink-0">
                     <FaEnvelope className="text-xs text-blue-400" />
                   </div>
                   <span className="hidden sm:inline">support@techify.com</span>
-                  <span className="sm:hidden">support@site.com</span>
+                  <span className="sm:hidden">support@techify.com</span>
                 </a>
                 <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-300">
                   <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
@@ -173,7 +173,7 @@ const Footer = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             {/* Copyright */}
             <p className="text-xs sm:text-sm text-slate-400 text-center sm:text-left">
-              © {currentYear} Singitronic. All rights reserved.
+              © {currentYear} Techify. All rights reserved.
             </p>
 
             {/* Social Links */}
@@ -193,7 +193,7 @@ const Footer = () => {
                 <FaTwitter className="text-xs sm:text-sm text-slate-400 group-hover:text-white" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/techify.maroc?igsh=MTUzcTI1cGhwMTRtbQ=="
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 hover:bg-pink-500 flex items-center justify-center transition-all group"
                 aria-label="Instagram"
               >

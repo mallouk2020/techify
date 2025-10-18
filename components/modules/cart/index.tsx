@@ -115,7 +115,7 @@ export const CartModule = () => {
                       ) : (
                         <>
                           <FaClock className="text-slate-400 flex-shrink-0" />
-                          <span className="text-slate-600">يتم التوصيل في 3 أيام</span>
+                          <span className="text-slate-600">يتم التوصيل خلال 1-2 أيام</span>
                         </>
                       )}
                     </div>
@@ -140,11 +140,11 @@ export const CartModule = () => {
         <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
           <div className="flex flex-col items-center text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
             <FaTruck className="text-2xl sm:text-3xl text-blue-600 mb-2" />
-            <p className="text-xs sm:text-sm font-medium text-slate-700">شحن مجاني</p>
+            <p className="text-xs sm:text-sm font-medium text-slate-700">شحن سريع</p>
           </div>
           <div className="flex flex-col items-center text-center p-3 sm:p-4 bg-green-50 rounded-lg">
             <FaShieldHalved className="text-2xl sm:text-3xl text-green-600 mb-2" />
-            <p className="text-xs sm:text-sm font-medium text-slate-700">دفع آمن</p>
+            <p className="text-xs sm:text-sm font-medium text-slate-700">دفع عند الاستلام</p>
           </div>
           <div className="flex flex-col items-center text-center p-3 sm:p-4 bg-cyan-50 rounded-lg">
             <FaCheck className="text-2xl sm:text-3xl text-cyan-600 mb-2" />
@@ -199,7 +199,7 @@ export const CartModule = () => {
               href="/checkout"
               className="block w-full text-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold px-6 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-base sm:text-lg"
             >
-              الذهاب للدفع
+           تاكيدالطلب
             </Link>
 
             <Link

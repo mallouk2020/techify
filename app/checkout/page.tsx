@@ -369,7 +369,7 @@ const CheckoutPage = () => {
                   value={checkoutForm.phone}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
                   type="tel"
-                  placeholder="مثال: 0501234567"
+                  placeholder="مثال: 0661234567"
                   disabled={isSubmitting}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100"
                 />
@@ -446,7 +446,7 @@ const CheckoutPage = () => {
                   rows={3}
                   value={checkoutForm.adress}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, adress: e.target.value })}
-                  placeholder="مثال: الرياض، حي النزهة، شارع الملك فهد، بجوار مركز التسوق"
+                  placeholder="مثال:الدار البيضاء، حي المعاريف، شارع الزرقطوني، بالقرب من مركز التوين سنتر"
                   disabled={isSubmitting}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100"
                 />
@@ -525,11 +525,11 @@ const CheckoutPage = () => {
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex flex-col items-end">
                       <p className="font-bold text-gray-900 text-lg">
-                        Dhs{Number(product?.price || 0).toFixed(2)}
+                        {Number(product?.price || 0).toFixed(2)}Dhs
                       </p>
                       {product?.oldPrice && product.oldPrice > product.price && (
                         <span className="text-xs text-gray-400 line-through">
-                          Dhs{Number(product.oldPrice).toFixed(2)}
+                          {Number(product.oldPrice).toFixed(2)}dhs
                         </span>
                       )}
                     </div>
@@ -548,14 +548,14 @@ const CheckoutPage = () => {
 
             {calculateDiscount() > 0 && (
               <div className="mt-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
-                تم توفير Dhs{calculateDiscount().toFixed(2)}
+                {calculateDiscount().toFixed(2)}Dhs تم توفير 
               </div>
             )}
 
             <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
               <div className="flex justify-between text-gray-600">
                 <span>المجموع الفرعي</span>
-                <span>Dhs{calculateSubtotal().toFixed(2)}</span>
+                <span>{calculateSubtotal().toFixed(2)}Dhs</span>
               </div>
 
               <div className="flex justify-between text-gray-600">
@@ -569,7 +569,7 @@ const CheckoutPage = () => {
 
               <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
                 <span>الإجمالي</span>
-                <span>Dhs{calculateFinalTotal().toFixed(2)}</span>
+                <span>{calculateFinalTotal().toFixed(2)}Dhs</span>
               </div>
             </div>
           </div>
