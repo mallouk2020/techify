@@ -2,7 +2,7 @@
 import { CustomButton, DashboardSidebar, SectionTitle } from "@/components";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState, use } from "react";
+import React, { useCallback, useEffect, useState, use } from "react";
 import toast from "react-hot-toast";
 import {
   convertCategoryNameToURLFriendly as convertSlugToURLFriendly,
@@ -106,32 +106,23 @@ const DashboardProductDetails = ({
   };
 
   // fetching main product data including other product images
-  const fetchProductData = async () => {
-    apiClient.get(`/api/products/${id}`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setProduct(data);
-      });
+  const fetchProductData = useCallback(async () => {
+    const productResponse = await apiClient.get(`/api/products/${id}`);
+    const productData = await productResponse.json();
+    setProduct(productData);
 
     const imagesData = await apiClient.get(`/api/images/${id}`, {
       cache: "no-store",
     });
     const images = await imagesData.json();
-    setOtherImages((currentImages) => images);
-  };
+    setOtherImages(images);
+  }, [id]);
 
-  // fetching all product categories. It will be used for displaying categories in select category input
-  const fetchCategories = async () => {
-    apiClient.get(`/api/categories`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setCategories(data);
-      });
-  };
+  const fetchCategories = useCallback(async () => {
+    const response = await apiClient.get(`/api/categories`);
+    const data = await response.json();
+    setCategories(data);
+  }, []);
 
   // دالة رفع صور متعددة
   const uploadMultipleImages = async (files: FileList) => {
@@ -198,7 +189,7 @@ const DashboardProductDetails = ({
   useEffect(() => {
     fetchCategories();
     fetchProductData();
-  }, [id]);
+  }, [id, fetchProductData, fetchCategories]);
 
   return (
     <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">

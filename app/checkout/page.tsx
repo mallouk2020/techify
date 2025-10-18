@@ -251,38 +251,73 @@ const CheckoutPage = () => {
     }
   };
 
-  // --- Auto-fill user data from session ---
+  // --- Auto-fill user data from session or API ---
   useEffect(() => {
-    if (session?.user && !isDataAutoFilled) {
-      const user = session.user as any;
-      
-      console.log("🔍 Session user data:", {
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address
-      });
-      
-      // تعبئة البيانات المتوفرة فقط
-      const updatedForm: any = {
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        adress: user.address || "",
-        orderNotice: "",
-      };
-      
-      // تحقق من وجود بيانات فعلية
-      const hasData = !!(user.name || user.email || user.phone || user.address);
-      
-      if (hasData) {
-        setCheckoutForm(updatedForm);
-        setIsDataAutoFilled(true);
-        toast.success("تم ملء بياناتك تلقائياً من ملفك الشخصي");
-      } else {
-        console.log("⚠️ No user data found in session. User may need to logout and login again.");
+    const autoFillUserData = async () => {
+      if (session?.user && !isDataAutoFilled) {
+        const user = session.user as any;
+        
+        console.log("🔍 Session user data:", {
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address
+        });
+        
+        // جرب جلب البيانات من الـ API أيضاً للتأكد
+        try {
+          const response = await apiClient.get("/api/user/profile");
+          const apiData = await response.json();
+          const apiUser = apiData.user;
+          
+          console.log("📡 API user data:", apiUser);
+          
+          // استخدم بيانات الـ API إذا كانت متوفرة
+          const finalUser = {
+            name: apiUser?.name || user.name || "",
+            email: apiUser?.email || user.email || "",
+            phone: apiUser?.phone || user.phone || "",
+            address: apiUser?.address || user.address || "",
+          };
+          
+          const updatedForm: any = {
+            name: finalUser.name,
+            email: finalUser.email,
+            phone: finalUser.phone,
+            adress: finalUser.address,
+            orderNotice: "",
+          };
+          
+          // تحقق من وجود بيانات فعلية
+          const hasData = !!(finalUser.name || finalUser.email || finalUser.phone || finalUser.address);
+          
+          if (hasData) {
+            setCheckoutForm(updatedForm);
+            setIsDataAutoFilled(true);
+            toast.success("✅ تم ملء بياناتك تلقائياً من ملفك الشخصي");
+          }
+        } catch (error) {
+          console.error("❌ خطأ في جلب بيانات المستخدم:", error);
+          
+          // حتى لو فشل الـ API، استخدم بيانات الجلسة
+          const updatedForm: any = {
+            name: user.name || "",
+            email: user.email || "",
+            phone: user.phone || "",
+            adress: user.address || "",
+            orderNotice: "",
+          };
+          
+          const hasData = !!(user.name || user.email || user.phone || user.address);
+          if (hasData) {
+            setCheckoutForm(updatedForm);
+            setIsDataAutoFilled(true);
+          }
+        }
       }
-    }
+    };
+    
+    autoFillUserData();
   }, [session, isDataAutoFilled]);
 
   // --- Redirect if cart is empty (with delay to allow data loading) ---
@@ -490,11 +525,11 @@ const CheckoutPage = () => {
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex flex-col items-end">
                       <p className="font-bold text-gray-900 text-lg">
-                        ${Number(product?.price || 0).toFixed(2)}
+                        Dhs{Number(product?.price || 0).toFixed(2)}
                       </p>
                       {product?.oldPrice && product.oldPrice > product.price && (
                         <span className="text-xs text-gray-400 line-through">
-                          ${Number(product.oldPrice).toFixed(2)}
+                          Dhs{Number(product.oldPrice).toFixed(2)}
                         </span>
                       )}
                     </div>
@@ -513,20 +548,20 @@ const CheckoutPage = () => {
 
             {calculateDiscount() > 0 && (
               <div className="mt-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
-                تم توفير ${calculateDiscount().toFixed(2)}
+                تم توفير Dhs{calculateDiscount().toFixed(2)}
               </div>
             )}
 
             <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
               <div className="flex justify-between text-gray-600">
                 <span>المجموع الفرعي</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+                <span>Dhs{calculateSubtotal().toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between text-gray-600">
                 <span>التوصيل</span>
                 {calculateMaxShipping() > 0 ? (
-                  <span>${calculateMaxShipping().toFixed(2)}</span>
+                  <span>Dhs{calculateMaxShipping().toFixed(2)}</span>
                 ) : (
                   <span className="text-green-600 font-semibold">مجاني</span>
                 )}
@@ -534,7 +569,7 @@ const CheckoutPage = () => {
 
               <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
                 <span>الإجمالي</span>
-                <span>${calculateFinalTotal().toFixed(2)}</span>
+                <span>Dhs{calculateFinalTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>

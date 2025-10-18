@@ -4,7 +4,7 @@ import { useProductStore } from "@/app/_zustand/store";
 import apiClient from "@/lib/api";
 import { nanoid } from "nanoid";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -14,60 +14,51 @@ import { sanitize } from "@/lib/sanitize";
 export const WishlistModule = () => {
   const { data: session, status } = useSession();
   const { wishlist, setWishlist } = useWishlistStore();
-  const { addToCart } = useProductStore();
+  const { addToCart, calculateTotals } = useProductStore();
 
-  const getWishlistByUserId = async (id: string) => {
-    const response = await apiClient.get(`/api/wishlist/${id}`, {
+  const getWishlistByUserId = useCallback(async (userId: string) => {
+    const response = await apiClient.get(`/api/wishlist/${userId}`, {
       cache: "no-store",
     });
     const wishlist = await response.json();
 
-    const productArray: {
-      id: string;
-      title: string;
-      price: number;
-      image: string;
-      slug: string;
-      stockAvailabillity: number;
-    }[] = [];
-
-    wishlist.map((item: any) => 
-      productArray.push({ 
-        id: item?.product?.id, 
-        title: item?.product?.title, 
-        price: item?.product?.price, 
-        image: item?.product?.mainImage, 
-        slug: item?.product?.slug, 
-        stockAvailabillity: item?.product?.inStock 
-      })
-    );
+    const productArray = wishlist.map((item: any) => ({
+      id: item?.product?.id,
+      title: item?.product?.title,
+      price: item?.product?.price,
+      image: item?.product?.mainImage,
+      slug: item?.product?.slug,
+      stockAvailabillity: item?.product?.inStock,
+    }));
 
     setWishlist(productArray);
-  };
-
-  const getUserByEmail = async () => {
-    if (session?.user?.email) {
-      apiClient.get(`/api/users/email/${session?.user?.email}`, {
-        cache: "no-store",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          getWishlistByUserId(data?.id);
-        });
-    }
-  };
+  }, [setWishlist]);
 
   useEffect(() => {
-    getUserByEmail();
-  }, [session?.user?.email]);
+    const user = session?.user as { id?: string | null } | undefined;
+    if (user?.id) {
+      getWishlistByUserId(user.id);
+    }
+  }, [session?.user, getWishlistByUserId]);
 
-  const handleRemoveItem = async (id: string) => {
-    // Remove from local state
-    const updatedWishlist = wishlist.filter(item => item.id !== id);
-    setWishlist(updatedWishlist);
-    
-    // TODO: Call API to remove from database if needed
-    toast.success("Removed from wishlist");
+  const handleRemoveItem = async (item: any) => {
+    const userId = (session?.user as { id?: string | null })?.id;
+    if (!userId) return;
+
+    try {
+      const response = await apiClient.delete(
+        `/api/wishlist/${userId}/${item.id}`
+      );
+
+      if (response.ok) {
+        const updatedWishlist = wishlist.filter(w => w.id !== item.id);
+        setWishlist(updatedWishlist);
+        toast.success("تم حذف من المفضلة");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("خطأ في الحذف");
+    }
   };
 
   const handleAddToCart = (product: any) => {
@@ -78,12 +69,8 @@ export const WishlistModule = () => {
       mainImage: product.image,
       amount: 1
     });
-    toast.success("Added to cart");
-  };
-
-  const handleMoveToCart = (product: any) => {
-    handleAddToCart(product);
-    handleRemoveItem(product.id);
+    calculateTotals();
+    toast.success("تم إضافة المنتج للسلة");
   };
 
   // Empty wishlist state
@@ -153,7 +140,7 @@ export const WishlistModule = () => {
               
               {/* Remove Button */}
               <button
-                onClick={() => handleRemoveItem(item.id)}
+                onClick={() => handleRemoveItem(item)}
                 className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 backdrop-blur-sm hover:bg-red-50 text-slate-600 hover:text-red-500 flex items-center justify-center shadow-md transition-all duration-200 opacity-0 group-hover:opacity-100"
                 aria-label="Remove from wishlist"
               >
@@ -192,7 +179,7 @@ export const WishlistModule = () => {
 
               {/* Actions */}
               <button
-                onClick={() => handleMoveToCart(item)}
+                onClick={() => handleAddToCart(item)}
                 disabled={item.stockAvailabillity <= 0}
                 className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed text-white font-medium px-3 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-xs"
               >

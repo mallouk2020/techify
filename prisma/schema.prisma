@@ -26,6 +26,10 @@ model Product {
   description    String
   manufacturer   String
   inStock        Int                      @default(1)
+  stock          Int?                     @default(0)
+  shippingCost   Int?                     @default(0)
+  colors         String?                  // JSON string or comma-separated values
+  sizes          String?                  // JSON string or comma-separated values
   categoryId     String
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customerOrders customer_order_product[]

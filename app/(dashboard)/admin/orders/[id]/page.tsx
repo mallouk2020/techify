@@ -292,7 +292,7 @@ const AdminSingleOrder = () => {
           ))}
           <div className="flex flex-col gap-y-2 mt-10">
             <p className="text-2xl font-semibold">
-              Order Total: ${order?.total}
+              Order Total: Dhs{order?.total}
             </p>
             <p className="text-sm text-gray-600 mt-2">
               * Total includes all discounts and shipping costs calculated at checkout

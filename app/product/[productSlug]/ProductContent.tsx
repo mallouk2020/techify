@@ -216,12 +216,12 @@ export default function ProductContent({ product, images, slug }: ProductContent
 
               <div className="flex items-baseline gap-3 mb-5">
                 <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  ${product?.price}
+                  Dhs{product?.price}
                 </span>
                 {product?.oldPrice && product.oldPrice > product.price && (
                   <>
                     <span className="text-xl sm:text-2xl font-semibold text-slate-400 line-through">
-                      ${product.oldPrice}
+                      Dhs{product.oldPrice}
                     </span>
                     <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                       -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
@@ -346,7 +346,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">الشحن</h3>
                 <p className="text-xs text-slate-500">
                   {product?.shippingCost && product.shippingCost > 0
-                    ? `تكلفة التوصيل: $${product.shippingCost}`
+                    ? `تكلفة التوصيل: Dhs${product.shippingCost}`
                     : "مجاني إلى جميع مدن المغرب"}
                 </p>
               </div>

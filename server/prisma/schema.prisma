@@ -38,7 +38,7 @@ model Image {
 
 // ✅ Updated User Model with phone, address, and name
 model User {
-  id        String     @id @default(uuid())
+  id        String           @id @default(uuid())
   name      String?    // ✅ Added: Full name
   email     String     @unique
   password  String?
@@ -48,10 +48,13 @@ model User {
   createdAt DateTime   @default(now())  // ✅ Added: Track creation
   updatedAt DateTime   @updatedAt       // ✅ Added: Track updates
   Wishlist  Wishlist[]
+  orders    Customer_order[]
 }
 
 model Customer_order {
   id            String                   @id @default(uuid())
+  userId        String?                  // ربط الطلب بالمستخدم (اختياري)
+  user          User?                    @relation(fields: [userId], references: [id])
   name          String
   lastname      String?
   phone         String

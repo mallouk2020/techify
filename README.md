@@ -375,6 +375,62 @@ npx prisma generate
 npx prisma migrate deploy
 ```
 
+### ⚠️ مهم جداً | Important: Database Management
+#### الفرق بين أوامر Prisma | Prisma Commands Difference
+
+**❌ لا تستخدم هذا الأمر مع البيانات الموجودة:**
+```bash
+npx prisma db push
+# ⚠️ هذا الأمر قد يحذف البيانات إذا كان هناك تعارض بين schema و database!
+# ⚠️ استخدمه فقط عند بدء مشروع جديد
+```
+
+**✅ استخدم هذا الأمر دائماً عند التعديل على Schema:**
+```bash
+cd server
+npx prisma migrate dev --name "اسم التعديل"
+# مثال:
+npx prisma migrate dev --name "add_shipping_cost_to_products"
+```
+
+#### الفرق التفصيلي | Detailed Comparison:
+
+| الأمر | الهدف | البيانات | الاستخدام |
+|------|------|---------|---------|
+| `npx prisma db push` | مزامنة schema مع database مباشرة | ⚠️ قد تُحذف | مشاريع جديدة فقط |
+| `npx prisma migrate dev` | إنشاء migration وتطبيقه | ✅ آمن جداً | التطوير والإنتاج |
+| `npx prisma migrate deploy` | تطبيق migrations الموجودة | ✅ آمن جداً | خوادم الإنتاج |
+| `npx prisma studio` | عرض و تعديل البيانات | ✅ للتحقق | الفحص والاختبار |
+
+#### خطوات آمنة عند التعديل على Schema:
+
+```bash
+# الخطوة 1: عدّل schema.prisma
+# مثال: أضفت حقل جديد
+
+# الخطوة 2: أنشئ migration (تسجل التغييرات)
+npx prisma migrate dev --name "وصف التعديل"
+
+# الخطوة 3: تحقق من البيانات
+npx prisma studio
+
+# الخطوة 4: اختبر الدوال والـ API
+# ...
+
+# الخطوة 5: push للـ Git و اعملها commit
+git add .
+git commit -m "feat: add shipping cost field to products"
+```
+
+#### الفحص السريع للبيانات:
+```bash
+# لتشغيل Prisma Studio والتحقق من البيانات
+npx prisma studio
+# ثم ادخل على http://localhost:5555
+```
+
+---
+
 ### 6. Run Development Servers
 
 **Frontend:**

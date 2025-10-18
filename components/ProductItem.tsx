@@ -115,12 +115,12 @@ const ProductItem = ({
           <p className={`text-base sm:text-lg font-bold ${
             color === "black" ? "text-slate-900" : "text-white"
           }`}>
-            ${product.price}
+          {product.price}Dhs
           </p>
           {product.oldPrice && product.oldPrice > product.price && (
             <>
               <p className="text-xs sm:text-sm text-slate-500 line-through">
-                ${product.oldPrice}
+                {product.oldPrice}Dhs
               </p>
               <span className="ml-auto text-[10px] sm:text-xs font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded whitespace-nowrap">
                 -{discountPercentage}%

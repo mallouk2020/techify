@@ -3,7 +3,8 @@ import { DashboardSidebar } from "@/components";
 import apiClient from "@/lib/api";
 import { convertCategoryNameToURLFriendly as convertSlugToURLFriendly } from "@/utils/categoryFormating";
 import { sanitizeFormData } from "@/lib/form-sanitize";
-import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 // تعريف نوع Category
@@ -170,23 +171,23 @@ const AddNewProduct = () => {
   };
 
   // ✅ دالة جلب الفئات
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await apiClient.get(`/api/categories`);
       const data = await res.json();
       setCategories(data);
       if (data.length > 0) {
-        setProduct(prev => ({ ...prev, categoryId: data[0].id }));
+        setProduct((prev) => ({ ...prev, categoryId: data[0].id }));
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Failed to load categories");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return (
     <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
@@ -471,16 +472,12 @@ const AddNewProduct = () => {
             />
             {product?.mainImage && (
               <div className="mt-2">
-                <img
-                  src={product.mainImage}
+                <Image
+                  src={product.mainImage || "/product_placeholder.jpg"}
                   alt={product.title || "Product preview"}
                   width={100}
                   height={100}
                   className="object-cover rounded border"
-                  onError={(e) => {
-                    console.error("فشل تحميل الصورة:", e);
-                    (e.target as HTMLImageElement).src = "/product_placeholder.jpg";
-                  }}
                 />
                 <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
               </div>
