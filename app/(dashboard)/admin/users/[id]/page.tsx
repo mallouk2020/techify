@@ -42,40 +42,44 @@ const DashboardSingleUserPage = ({
   };
 
   const updateUser = async () => {
-    if (
-      userInput.email.length > 3 &&
-      userInput.role.length > 0 &&
-      userInput.newPassword.length > 0
-    ) {
-      if (!isValidEmailAddressFormat(userInput.email)) {
-        toast.error("You entered invalid email address format");
-        return;
-      }
+    // Email and role are required for an update.
+    if (!(userInput.email.length > 3 && userInput.role.length > 0)) {
+      toast.error("Please provide a valid email and role to update the user");
+      return;
+    }
 
+    if (!isValidEmailAddressFormat(userInput.email)) {
+      toast.error("You entered invalid email address format");
+      return;
+    }
+
+    // Build payload: include password/changePassword only when a new password was provided
+    const payload: any = {
+      email: userInput.email,
+      role: userInput.role,
+    };
+
+    if (userInput.newPassword && userInput.newPassword.length > 0) {
       if (userInput.newPassword.length <= 7) {
         toast.error("Password must be longer than 7 characters");
         return;
       }
+      payload.password = userInput.newPassword;
+      payload.changePassword = true;
+    }
 
-      try {
-        const response = await apiClient.put(`/api/users/${id}`, {
-          email: userInput.email,
-          password: userInput.newPassword,
-          role: userInput.role,
-        });
+    try {
+      const response = await apiClient.put(`/api/users/${id}`, payload);
 
-        if (response.ok) {
-          toast.success("User successfully updated");
-        } else {
-          const errorData = await response.json();
-          toast.error(errorData.message || "Error while updating user");
-        }
-      } catch (error) {
-        console.error("Update error:", error);
-        toast.error("There was an error while updating user");
+      if (response.ok) {
+        toast.success("User successfully updated");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Error while updating user");
       }
-    } else {
-      toast.error("For updating a user you must enter all values");
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error("There was an error while updating user");
     }
   };
 

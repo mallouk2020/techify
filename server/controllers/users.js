@@ -66,6 +66,18 @@ const updateUser = asyncHandler(async (request, response) => {
     throw new AppError("User not found", 404);
   }
 
+  // Debug/logging: record who is attempting the update and which fields are present
+  try {
+    const reqId = request.reqId || request.headers['x-request-id'] || null;
+    const ip = request.ip || request.headers['x-forwarded-for'] || null;
+    const bodyKeys = Object.keys(request.body || {}).join(',');
+    // Avoid logging sensitive values. Log only whether password field was present.
+    // eslint-disable-next-line no-console
+    console.info(`[users:updateUser] reqId=${reqId} ip=${ip} userId=${id} bodyKeys=${bodyKeys} passwordPresent=${typeof password !== 'undefined'} changePasswordFlag=${request.body?.changePassword === true}`);
+  } catch (e) {
+    // ignore logging failures
+  }
+
   // Prepare update data
   const updateData = {};
   if (email) {
@@ -75,11 +87,18 @@ const updateUser = asyncHandler(async (request, response) => {
     }
     updateData.email = email;
   }
-  if (password) {
-    if (password.length < 8) {
+  // Only update password if the client explicitly requested a password change by
+  // setting `changePassword: true` in the request body. This prevents accidental
+  // overwrites when other clients/tools send an empty or unintended `password` field.
+  if (typeof password !== 'undefined' && request.body?.changePassword === true) {
+    if (!password || password.length < 8) {
       throw new AppError("Password must be at least 8 characters long", 400);
     }
     updateData.password = await bcrypt.hash(password, 14);
+  } else if (typeof password !== 'undefined' && request.body?.changePassword !== true) {
+    // Log that a password field was present but changePassword flag was not set.
+    // eslint-disable-next-line no-console
+    console.warn(`[users:updateUser] password field present but changePassword flag not set; ignoring password update for user ${existingUser.id}`);
   }
   if (role) {
     updateData.role = role;
