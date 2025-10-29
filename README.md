@@ -758,6 +758,8 @@ git commit -m "refactor: improve code structure"
 
 ## 📝 آخر التحديثات | Latest Updates
 
+> Cleanup details and notes: see `docs/CLEANUP-2025-10-29.md` (recent cleanup of runtime logs and repo housekeeping).
+
 ### v2.2.0 - Product Card Responsive Fix + Color/Size Features (يناير 2025)
 
 #### ✨ الميزات الجديدة

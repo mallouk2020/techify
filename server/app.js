@@ -14,6 +14,7 @@ const orderProductRouter = require('./routes/customer_order_product');
 const path = require('path');
 const wishlistRouter = require('./routes/wishlist');
 const heroRouter = require('./routes/hero');
+const analyticsRouter = require('./routes/analytics');
 var cors = require("cors");
 
 // Import logging middleware
@@ -39,8 +40,11 @@ const {
   passwordResetLimiter,
   adminLimiter,
   wishlistLimiter,
-  productLimiter
+  productLimiter,
+  createDynamicLimiter
 } = require('./middleware/advancedRateLimiter');
+
+const pageViewLimiter = createDynamicLimiter(60 * 1000, 60, "Too many analytics requests, please slow down.");
 
 const {
   handleServerError
@@ -119,6 +123,7 @@ app.use("/api/images", uploadLimiter);
 app.use("/api/main-image", uploadLimiter);
 app.use("/api/wishlist", wishlistLimiter);
 app.use("/api/products", productLimiter);
+app.use("/api/analytics", pageViewLimiter);
 
 // Apply stricter rate limiting to authentication-related routes
 app.use("/api/users/email", authLimiter); // For login attempts via email lookup
@@ -137,6 +142,7 @@ app.use('/api/order-product', orderProductRouter);
 app.use("/api/slugs", slugRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/hero", heroRouter);
+app.use("/api/analytics", analyticsRouter);
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {

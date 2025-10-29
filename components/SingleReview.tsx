@@ -38,7 +38,7 @@ const SingleReview = () => {
       </div>
       <footer className="mb-5 text-sm text-gray-500 dark:text-gray-400">
         <p>
-          Reviewed in the United Kingdom on <time>March 3, 2017</time>
+          Reviewed in the United Kingdom on <time>March 3, 2025</time>
         </p>
       </footer>
       <p className="mb-2 text-gray-500 dark:text-gray-400 max-[400px]:text-sm">

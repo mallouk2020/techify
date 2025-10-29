@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import Providers from "@/Providers";
 import SessionTimeoutWrapper from "@/components/SessionTimeoutWrapper";
 import { authOptions } from "@/lib/auth-options";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default async function RootLayout({
       <body className={`${inter.className} overflow-x-hidden`}>
         <SessionProvider session={session}>
           <SessionTimeoutWrapper />
+            <PageViewTracker />
           <Header />
           <Providers>
             {children}

@@ -164,9 +164,9 @@ export default function ProductContent({ product, images, slug }: ProductContent
                   متوفر
                 </div>
               ) : product?.inStock === 2 ? (
-                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-blue-300 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">
+                <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-blue-300/80 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10 backdrop-blur-sm">
                   <Clock className="w-4 h-4" />
-                  جاهز عند اطلب
+                  جاهز عند الطلب
                 </div>
               ) : (
                 <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 bg-red-500 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-2 z-10">

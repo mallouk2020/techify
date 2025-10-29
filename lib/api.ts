@@ -12,6 +12,9 @@ const ensureLeadingSlash = (value: string) =>
 const trimTrailingSlash = (value: string) =>
   (value.endsWith('/') ? value.slice(0, -1) : value);
 
+const looksLikeLocalhost = (value?: string | null) =>
+  value ? /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(value) : false;
+
 export const apiClient = {
   baseUrl: config.apiBaseUrl,
 
@@ -24,9 +27,12 @@ export const apiClient = {
     const isBrowser = typeof window !== 'undefined';
 
     let resolvedBaseUrl = this.baseUrl;
+    const baseUrlLooksLocal = looksLikeLocalhost(this.baseUrl);
 
     if (!requestIsAbsolute) {
-      if (isBrowser) {
+      if (!baseUrlLooksLocal && this.baseUrl) {
+        resolvedBaseUrl = this.baseUrl;
+      } else if (isBrowser) {
         const hostname = window.location.hostname;
         const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
 
