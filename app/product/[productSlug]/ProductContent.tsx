@@ -20,6 +20,7 @@ import {
   AddToWishlistBtn,
 } from "@/components";
 import { sanitize } from "@/lib/sanitize";
+import { trackViewContent, trackAddToCart } from "@/lib/facebookPixel";
 
 interface ImageItem {
   imageID: string;
@@ -43,6 +44,15 @@ export default function ProductContent({ product, images, slug }: ProductContent
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   
+  // تتبع عرض المنتج عند فتح الصفحة
+  useEffect(() => {
+    trackViewContent(
+      product?.id?.toString() || "unknown",
+      sanitize(product?.title) || "منتج",
+      product?.price || 0
+    );
+  }, [product?.id]);
+
   const parseAttributeValues = (value: unknown): string[] => {
     if (!value) return [];
 
@@ -88,7 +98,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
   // دمج الصورة الرئيسية مع الصور الإضافية
   const allImages = [mainImage, ...images?.map(item => item.image).filter(Boolean)];
   
-  // دالة إضافة المنتج للسلة
+  // دالة إضافة المنتج للسلة مع تتبع Pixel
   const handleAddToCart = () => {
     addToCart({
       id: product?.id.toString(),
@@ -102,10 +112,19 @@ export default function ProductContent({ product, images, slug }: ProductContent
       selectedSize: selectedSize || undefined
     });
     calculateTotals();
+    
+    // تتبع إضافة المنتج للسلة
+    trackAddToCart(
+      product?.id?.toString() || "unknown",
+      sanitize(product?.title) || "منتج",
+      product?.price || 0,
+      quantity
+    );
+    
     toast.success("تم إضافة المنتج إلى السلة");
   };
 
-  // دالة الشراء الآن - Smart Logic
+  // دالة الشراء الآن - Smart Logic مع تتبع Pixel
   const handleBuyNow = () => {
     // التحقق إذا المنتج موجود في السلة
     const existingProduct = products.find(p => p.id === product?.id.toString());
@@ -128,6 +147,15 @@ export default function ProductContent({ product, images, slug }: ProductContent
         selectedSize: selectedSize || undefined
       });
       calculateTotals();
+      
+      // تتبع إضافة المنتج للسلة
+      trackAddToCart(
+        product?.id?.toString() || "unknown",
+        sanitize(product?.title) || "منتج",
+        product?.price || 0,
+        quantity
+      );
+      
       toast.success("تم إضافة المنتج للسلة");
       setTimeout(() => router.push("/checkout"), 500);
     }
@@ -360,7 +388,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
               </div>
 
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teال-600 rounded-xl flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-3">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">ضمان الجودة</h3>
