@@ -70,6 +70,7 @@ app.use(errorLogger);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://192.168.8.100:3000',
   'https://techify-beta.vercel.app',
   process.env.NEXTAUTH_URL,
   process.env.FRONTEND_URL,

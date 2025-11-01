@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useProductStore } from "@/app/_zustand/store";
+import QuickCheckout from "@/components/QuickCheckout";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import {
@@ -51,7 +52,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
       sanitize(product?.title) || "منتج",
       product?.price || 0
     );
-  }, [product?.id]);
+  }, [product?.id, product?.price, product?.title]);
 
   const parseAttributeValues = (value: unknown): string[] => {
     if (!value) return [];
@@ -328,6 +329,7 @@ export default function ProductContent({ product, images, slug }: ProductContent
               </div>
 
               {/* أزرار الشراء */}
+              {/* 
               {Boolean(product.inStock) ? (
                 <div className="space-y-3">
                   <button 
@@ -350,6 +352,32 @@ export default function ProductContent({ product, images, slug }: ProductContent
                   <p className="text-red-600 font-bold text-lg">المنتج غير متوفر حالياً</p>
                 </div>
               )}
+
+ */}
+
+
+{/* مكون الطلب السريع المؤقت */}
+{Boolean(product.inStock) ? (
+  <>
+    <QuickCheckout 
+      product={product}
+      quantity={quantity}
+      selectedColor={selectedColor}
+      selectedSize={selectedSize}
+    />
+  </>
+) : (
+  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
+    <p className="text-red-600 font-bold text-lg">المنتج غير متوفر حالياً</p>
+  </div>
+)}
+
+
+
+
+
+
+
 
               {/* رمز المنتج والمفضلة */}
               <div className="mt-5 pt-5 border-t border-slate-100 space-y-3">

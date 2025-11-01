@@ -31,7 +31,7 @@ const HeaderTop = () => {
         <ul className="flex items-center gap-2 sm:gap-3">
           <li>
             <a
-              href="https://wa.me/381611233211"
+              href="https://wa.me/0764949633"
               target="_blank"
               rel="noopener noreferrer"
               className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 hover:bg-green-500 flex items-center justify-center transition-all group"

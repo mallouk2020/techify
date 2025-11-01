@@ -50,7 +50,7 @@ const VisitsAreaChart: React.FC<VisitsAreaChartProps> = ({ data }) => {
       zoom: { enabled: false },
       animations: {
         enabled: true,
-        easing: "easeinout",
+        easing: "easeinout" as const,
         speed: 400,
       },
     },
